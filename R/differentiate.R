@@ -62,6 +62,8 @@ SecondOrderMixedDiffVal <- function(value.c,
 #' @param params Vector of parameters.
 #' @param epsilon Offset value for all components.
 #'
+#' @return Gradient of function \code{f} at parameters \code{params} with offset \code{epsilon}.
+#'
 #' @examples
 #' GradF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 1e-6)
 #' GradF(function(params){sum(params)}, params = c(2.5, 7), epsilon = 1e-6)
@@ -94,6 +96,8 @@ GradF <- function(f,
 #' @param params Vector of parameters.
 #' @param epsilon Offset value to add to all component of \code{params}.
 #'
+#' @return Evaluate of function \code{f} at parameters \code{params} with offset \code{epsilon}.
+#'
 #' @examples
 #' EvaluateF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 0)
 #' EvaluateF(function(params){sum(params)}, params = c(2.5, 7), epsilon = 1)
@@ -123,11 +127,13 @@ EvaluateF <- function(f,
   return(eval.f)
 }
 
-#' Computes Hessian matrix of a function given parameters and offset value epsilon.
+#' Computes Hessian matrix of a $C^2$ function given parameters and offset value epsilon
 #'
 #' @param f R function taking only a vector of parameter as input.
 #' @param params Vector of parameters.
 #' @param epsilon Offset value for all components.
+#'
+#' @return Hessian matrix of function \code{f} at parameters \code{params} with offset \code{epsilon}.
 #'
 #' @examples
 #' HessianF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 1e-6)
@@ -167,21 +173,3 @@ HessianF <- function(f,
   diag(hess.f) <- 0.5*diag(hess.f)
   return(hess.f)
 }
-
-# test
-## product of squares
-f.t <- function(params){
-  return(prod(params^2))
-}
-
-GradF(f.t, params = c(0.5, 7), epsilon = 1e-6)
-HessianF(f.t, rep(1,2), epsilon = 1e-6)
-
-## sum of squares
-f.t <- function(params){
-  return(sum(params^2))
-}
-
-GradF(f.t, params = c(0.5, 7), epsilon = 1e-6)
-HessianF(f.t, rep(1,2), epsilon = 1e-6)
-
