@@ -1,10 +1,11 @@
 #' Centered differentiation calculation.
 #'
-#' @param value.p function value at x+epsilon
-#' @param value.m function value at x-epsilon
+#' @param value.p function value at \code{x+epsilon}.
+#' @param value.m function value at \code{x-epsilon}.
+#' @param epsilon offset value for \code{x}.
 #'
 #' @return \code{(value.p - value.m) / (2*epsilon)}.
-#' @example
+#' @examples
 #' DiffVal(4, 2, 1)
 #' DiffVal(2.5, 2, 2)
 DiffVal <- function(value.p, value.m, epsilon){
@@ -15,14 +16,15 @@ DiffVal <- function(value.p, value.m, epsilon){
 
 #' Second-order centered differentiation calculation.
 #'
-#' @param value.p function value at x+epsilon
-#' @param value.c function value at x
-#' @param value.m function value at x-epsilon
+#' @param value.p function value at \code{x+epsilon}.
+#' @param value.c function value at \code{x}.
+#' @param value.m function value at \code{x-epsilon}.
+#' @param epsilon offset value for \code{x}.
 #'
 #' @return \code{(value.p -2*value.c + value.m) / (2*epsilon)}.
-#' @example
-#' DiffVal(4, 2, 1)
-#' DiffVal(2.5, 2, 2)
+#' @examples
+#' SecondOrderDiffVal(4, 3, 2, 1e-6)
+#' SecondOrderDiffVal(2.5, 5, 2, 1e-6)
 SecondOrderDiffVal <- function(value.p, value.c, value.m, epsilon){
   temp <- value.p + value.m
   temp <- temp - 2.0*value.c
@@ -30,7 +32,20 @@ SecondOrderDiffVal <- function(value.p, value.c, value.m, epsilon){
   return(temp / epsilon)
 }
 
-sec.diff.mix.val <- function(value.c,
+#' Second-order bivariate differentiation calculation.
+#'
+#' @param value.c function value at \code{(x,y)}.
+#' @param value.x.p function value at \code{(x+epsilonx,y)}.
+#' @param value.x.m function value at \code{(x-epsilon,y)}.
+#' @param value.x.p function value at \code{(x,y+epsilonx)}.
+#' @param value.x.m function value at \code{(x,y-epsilon)}.
+#' @param epsilon offset value for both \code{x} and \code{y}.
+#'
+#' @return \code{(value.p -2*value.c + value.m) / (2*epsilon)}.
+#' @examples
+#' SecondOrderMixedDiffVal(4, 3, 2, 3.5, 3, 2, 2.12, 1e-6)
+#' SecondOrderMixedDiffVal(4.52, 3.14, 2, 3.5, 3.175, 2.527, 2.51, 1e-1)
+SecondOrderMixedDiffVal <- function(value.c,
                              value.x.p, value.x.m,
                              value.y.p, value.y.m,
                              value.xy.p, value.xy.m,
@@ -41,7 +56,16 @@ sec.diff.mix.val <- function(value.c,
   return(temp/(2.0*epsilon))
 }
 
-grad.f <- function(f,
+#' Computes gradident of a function given parameters and offset value epsilon.
+#'
+#' @param f R function taking only a vector of parameter as input.
+#' @param params Vector of parameters.
+#' @param epsilon Offset value for all components.
+#'
+#' @examples
+#' GradF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 1e-6)
+#' GradF(function(params){sum(params)}, params = c(2.5, 7), epsilon = 1e-6)
+GradF <- function(f,
                    params,
                    epsilon=1e-6){
   params.fixed <- params
@@ -64,7 +88,16 @@ grad.f <- function(f,
   return(answer)
 }
 
-evaluate.f <- function(f,
+#' Evalutae function at given parameters.
+#'
+#' @param f R function taking only a vector of parameters as input.
+#' @param params Vector of parameters.
+#' @param epsilon Offset value to add to all component of \code{params}.
+#'
+#' @examples
+#' EvaluateF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 0)
+#' EvaluateF(function(params){sum(params)}, params = c(2.5, 7), epsilon = 1)
+EvaluateF <- function(f,
                        params,
                        epsilon){
   d <- length(params)
@@ -90,14 +123,23 @@ evaluate.f <- function(f,
   return(eval.f)
 }
 
-hessian.f <- function(f,
+#' Computes Hessian matrix of a function given parameters and offset value epsilon.
+#'
+#' @param f R function taking only a vector of parameter as input.
+#' @param params Vector of parameters.
+#' @param epsilon Offset value for all components.
+#'
+#' @examples
+#' HessianF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 1e-6)
+#' HessianF(function(params){sum(params^3)}, params = c(2.5, 7), epsilon = 1e-6)
+HessianF <- function(f,
                       params,
                       epsilon=1e-6){
   if(epsilon < 0.0) stop("Epsilon must be positive.")
 
   d <- length(params)
-  eval.f.p <- evaluate.f(f, params, epsilon = epsilon)
-  eval.f.m <- evaluate.f(f, params, epsilon = -epsilon)
+  eval.f.p <- EvaluateF(f, params, epsilon = epsilon)
+  eval.f.m <- EvaluateF(f, params, epsilon = -epsilon)
   hess.f <- matrix(0.0, d, d)
   f.value <- f(params)
 
@@ -109,7 +151,7 @@ hessian.f <- function(f,
                                              value.c = f.value,
                                              epsilon = epsilon)
       }else{
-        hess.f[main, second] <- sec.diff.mix.val(value.x.p = eval.f.p[main, main],
+        hess.f[main, second] <- SecondOrderMixedDiffVal(value.x.p = eval.f.p[main, main],
                                                  value.x.m = eval.f.m[main, main],
                                                  value.y.p = eval.f.p[second, second],
                                                  value.y.m = eval.f.m[second, second],
@@ -132,14 +174,14 @@ f.t <- function(params){
   return(prod(params^2))
 }
 
-grad.f(f.t, params = c(0.5, 7), epsilon = 1e-6)
-hessian.f(f.t, rep(1,2), epsilon = 1e-6)
+GradF(f.t, params = c(0.5, 7), epsilon = 1e-6)
+HessianF(f.t, rep(1,2), epsilon = 1e-6)
 
 ## sum of squares
 f.t <- function(params){
   return(sum(params^2))
 }
 
-grad.f(f.t, params = c(0.5, 7), epsilon = 1e-6)
-hessian.f(f.t, rep(1,2), epsilon = 1e-6)
+GradF(f.t, params = c(0.5, 7), epsilon = 1e-6)
+HessianF(f.t, rep(1,2), epsilon = 1e-6)
 
