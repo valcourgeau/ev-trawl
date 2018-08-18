@@ -18,7 +18,7 @@ ComputeAExp <- function(rho){
 #' @param rho Exponential trawl parameter (should be non-negative).
 #' @param t1 First timestamp.
 #' @param t2 Second timestamp.
-#' @return difference area between \code{t1} and \code{t2}
+#' @return Difference area between \code{t1} and \code{t2}
 #' under exponential trawl function.
 #'
 #' @examples
@@ -44,19 +44,33 @@ ComputeB3Exp <- function(rho, t1, t2){
 #' @param rho Exponential trawl parameter (should be non-negative).
 #' @param t1 First timestamp.
 #' @param t2 Second timestamp.
-#' @return difference area between \code{t1} and \code{t2}
+#' @return Difference area between \code{t1} and \code{t2}
 #' under exponential trawl function. Relies on ComputeB3Exp.
 #'
 #' @examples
 #' ComputeB1Exp(1, t1 = 3, t2 = 5)
 #' ComputeB1Exp(0.2, t1 = 7, t2 = 3)
-compute_B1_exp <- function(rho, t1, t2){
+ComputeB1Exp <- function(rho, t1, t2){
   if(rho < 0) stop('rho should be non-negative.')
   # Compute A_t_1 \ A_t_2
   return(ComputeB3Exp(rho, t2, t1))
 }
 
-compute_B_inter_exp <- function(rho, t1, t2){
+#' Wrapper to compute intersection area between \code{t1} and \code{t2}
+#' under exponential trawl function.
+#'
+#' @param rho Exponential trawl parameter (should be non-negative).
+#' @param t1 First timestamp.
+#' @param t2 Second timestamp.
+#' @return Intersection area between \code{t1} and \code{t2}
+#' under exponential trawl function.
+#'
+#' @examples
+#' ComputeBInterExp(1, t1 = 3, t2 = 5)
+#' ComputeBInterExp(0.2, t1 = 7, t2 = 3)
+ComputeBInterExp <- function(rho, t1, t2){
+  if(rho < 0) stop('rho should be non-negative.')
+
   if(t1 > t2){
     return(exp(rho * (t2-t1))/rho)
   }else{
@@ -73,8 +87,8 @@ rho <- 0.3
 t1 <- 0.1
 t2 <- 0.3
 ComputeAExp(rho)
-compute_B1_exp(rho, t1, t2) + compute_B_inter_exp(rho, t1, t2)
-ComputeB3Exp(rho, t1, t2) + compute_B_inter_exp(rho, t1, t2)
+ComputeB1Exp(rho, t1, t2) + ComputeBInterExp(rho, t1, t2)
+ComputeB3Exp(rho, t1, t2) + ComputeBInterExp(rho, t1, t2)
 
 is_vector_elem <- function(vec_to_check, var_name){
   return(var_name %in% vec_to_check)
@@ -85,29 +99,81 @@ test_vec <- c("elem")
 is_vector_elem(test_vec, "elem") # Returns True
 is_vector_elem(test_vec, "ele") # Returns False
 
-trf_inv_g <- function(z, alpha, beta, kappa, offset_scale, offset_shape){
-  # From GPD(alpha, beta+kappa) to GPD(offset, offset)
+#' Computes inverse of g from the marginal transform method (vectorised version).
+#' That is from GPD(offset_shape, offset_scale) to GPD(alpha, beta+kappa).
+#'
+#' @param z Data distributed as GPD(offset_shape, offset_scale).
+#' @param alpha Shape parameter of output data.
+#' @param beta Part of scale parameter of output data (beta + kappa).
+#' Should be positive.
+#' @param kappa Part of scale parameter of output data.
+#' Should be positive.
+#' @param offset_scale Scale parameter of input data.
+#' Should be positive.
+#' @param offset_shape Shape parameter of input data.
+#'
+#' @return GPD(alpha, beta+kappa)-distributed data from
+#' GPD(offset_shape, offset_scale)-distributed input data.
+#'
+#' @example
+#' TrfInverseG(c(0.1, 0.2), 2, 3, 2, 4, 1)
+TrfInverseG <- function(z, alpha, beta, kappa, offset_scale, offset_shape){
+  # From GPD(alpha, beta+kappa) to GPD(offset_shape, offset_scale)
+  if(beta <= 0) stop('beta should be positive.')
+  if(kappa <= 0) stop('kappa should be positive.')
+  if(offset_scale <= 0) stop('offset_scale should be positive.')
+
   res <- (offset_scale)*((1+sign(alpha)*z/(beta+kappa))^{alpha/offset_shape}-1)
 
   return(res)
 }
 
-trf_g <- function(x, alpha, beta, kappa, offset_scale, offset_shape){
-  # From GPD(offset, offset) to GPD(alpha, beta+kappa)
+#' Computes g from the marginal transform method (vectorised version).
+#' That is from GPD(alpha, beta+kappa) to GPD(offset_shape, offset_scale).
+#'
+#' @param z Data distributed as GPD(offset_shape, offset_scale).
+#' @param alpha Shape parameter of output data.
+#' @param beta Part of scale parameter of output data (beta + kappa).
+#' Should be positive.
+#' @param kappa Part of scale parameter of output data.
+#' Should be positive.
+#' @param offset_scale Scale parameter of input data.
+#' Should be positive.
+#' @param offset_shape Shape parameter of input data.
+#'
+#' @return GPD(offset_shape, offset_scale)-distributed data from
+#' GPD(alpha, beta+kappa)-distributed data input data.
+#'
+#' @example
+#' TrfG(c(0.1, 0.2), 2, 3, 2, 4, 1)
+TrfG <- function(x, alpha, beta, kappa, offset_scale, offset_shape){
+  # From GPD(offset_shape, offset_scale) to GPD(alpha, beta+kappa)
+  if(beta <= 0) stop('beta should be positive.')
+  if(kappa <= 0) stop('kappa should be positive.')
+  if(offset_scale <= 0) stop('offset_scale should be positive.')
+
   res <- sign(alpha)*(beta+kappa)*((1+x/(offset_scale))^{offset_shape/alpha}-1)
   return(res)
 }
 
-trf_find_offset_scale <- function(alpha, beta, kappa, offset_shape){
-  #extract_inverse_shape <- (1+kappa/beta)^{alpha/offset_shape} - 1
-  #return(1/extract_inverse_shape - 1.0)
+#' Computes predefined transformed scale parameter.
+#'
+#' @param alpha Shape parameter of output data.
+#' @param beta Part of scale parameter of output data (beta + kappa).
+#' Should be positive.
+#' @param kappa Part of scale parameter of output data.
+#' Should be positive.
+#' @param offset_shape Shape parameter of input data.
+#'
+#' @return Transformed scale parameter given original data parameters.
+#'
+#' @example
+#' TrfFindOffsetScale(c(0.1, 0.2), 2, 3, 2, 4, 1)
+TrfFindOffsetScale <- function(alpha, beta, kappa, offset_shape){
+  if(beta <= 0) stop('beta should be positive.')
+  if(kappa <= 0) stop('kappa should be positive.')
 
-  # We conserve entropy
-  # val_scale <- offset_shape * abs((beta+kappa)/alpha) * exp(1/alpha - 1/offset_shape)
-  # return(val_scale - 1)
-  #return(kappa/((1+sign(alpha)*kappa/beta)^{alpha/offset_shape}-1))
   return(1+kappa)
-  #return(1+kappa/beta)
 }
 
 # Example
@@ -118,22 +184,22 @@ rho <- 0.4
 n_moments <- 4
 
 offset_shape <- n_moments + 1
-offset_scale <- trf_find_offset_scale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
+offset_scale <- TrfFindOffsetScale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
 
 ## Verification of output densities
 n_samples <- 2^16
 gpd_data_offset <- gPdtest::rgp(n = n_samples, shape = 1/offset_shape, scale = (offset_scale)/offset_shape)
 gpd_data_ab <- gPdtest::rgp(n_samples, shape = 1/alpha, scale=(beta+kappa)/alpha)
 
-## Verification trf_inv_g and trf_g are inverse functions of eachother
-plot(1:5, 1:5-trf_inv_g(trf_g(x = 1:5, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape),
+## Verification TrfInverseG and TrfG are inverse functions of eachother
+plot(1:5, 1:5-TrfInverseG(TrfG(x = 1:5, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape),
                      alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), ylab = "id")
-plot(1:5, 1:5-trf_g(trf_inv_g(z = 1:5, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape),
+plot(1:5, 1:5-TrfG(TrfInverseG(z = 1:5, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape),
                  alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), ylab = "id")
 
 #### testing the marginal fits
 gPdtest::gpd.fit(gpd_data_ab, method = "amle") # should be 1/3 (1.2+3)/3
-gPdtest::gpd.fit(trf_g(x = gpd_data_offset, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), method ="amle")
+gPdtest::gpd.fit(TrfG(x = gpd_data_offset, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), method ="amle")
 
 
 # Example 2: negative alpha
@@ -144,12 +210,12 @@ rho <- 0.4
 n_moments <- 1
 
 offset_shape <- n_moments + 1
-offset_scale <- trf_find_offset_scale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
+offset_scale <- TrfFindOffsetScale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
 
-## Verification trf_inv_g and trf_g are inverse functions of eachother
-plot(1:5, 1:5-trf_inv_g(trf_g(x = 1:5, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape),
+## Verification TrfInverseG and TrfG are inverse functions of eachother
+plot(1:5, 1:5-TrfInverseG(TrfG(x = 1:5, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape),
                         alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), ylab = "id")
-plot(1:5, 1:5/5-trf_g(trf_inv_g(z = 1:5/5, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape),
+plot(1:5, 1:5/5-TrfG(TrfInverseG(z = 1:5/5, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape),
                     alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), ylab = "id")
 
 
@@ -159,29 +225,48 @@ gpd_data_offset <- gPdtest::rgp(n = n_samples, shape = 1/offset_shape, scale = (
 gpd_data_ab <- gPdtest::rgp(n_samples, shape = 1/alpha, scale=-(beta+kappa)/alpha)
 
 ### from GPD(offset, offset+kappa) to GPD(alpha, beta)
-hist(trf_g(x = gpd_data_offset, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), freq = F, breaks=80)
+hist(TrfG(x = gpd_data_offset, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), freq = F, breaks=80)
 
-plot(density(trf_g(x = gpd_data_offset, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)))
+plot(density(TrfG(x = gpd_data_offset, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)))
 lines(density(gpd_data_ab), type="l", col="red")
 lines(seq(0,15,length.out = 100), -alpha/(beta+kappa)*(1-seq(0,15,length.out = 100)/(beta+kappa))^{-alpha-1}, lty = 2, col="green")
 
 #### testing the marginal fits
 gPdtest::gpd.fit(gpd_data_ab, method = "combined") # -1/3 (0.5+1.2)/3
-gPdtest::gpd.fit(trf_g(x = gpd_data_offset, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), method ="combined")
+gPdtest::gpd.fit(TrfG(x = gpd_data_offset, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), method ="combined")
 
 ### from GPD(alpha, beta) to GPD(offset, offset+kappa)
 hist(gpd_data_offset[gpd_data_offset < 10], col="red", xlim=c(0,10), breaks=10, probability = T)
-lines(density(trf_inv_g(z = gpd_data_ab[gpd_data_ab < 1], alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)))
+lines(density(TrfInverseG(z = gpd_data_ab[gpd_data_ab < 1], alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)))
 lines(seq(0,5,length.out = 100), offset_shape/(offset_scale)*(1+seq(0,5,length.out = 100)/(offset_scale))^{-offset_shape-1}, lty = 2, col="green", lwd=2)
 
 #### testing the marginal fits
 gPdtest::gpd.fit(gpd_data_offset, method = "amle") # 1/2
-gPdtest::gpd.fit(trf_inv_g(z = gpd_data_ab, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), method ="amle")
+gPdtest::gpd.fit(TrfInverseG(z = gpd_data_ab, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), method ="amle")
 
+#' Computes the probability density function of Generalised Pareto Distribution at x,
+#' with shape parameter alpha and scale parameter beta.
+#'
+#' @param x value at which the pdf is evaluated.
+#' @param alpha Shape parameter.
+#' @param beta Scale parameter, should be positive.
+#'
+#' @return GPD pdf function evaluated at x with shape and scale parameters respectively alpha and beta.
+#' @example dlgpd(2.34, alpha = 1, beta = 2)
 dlgpd <- function(x, alpha, beta){
+  if(beta <= 0) stop('beta should be positive.')
   return(abs(alpha)/beta*max(0,(1+sign(alpha)*x/beta))^{-alpha-1.0})
 }
 
+#' Computes the cumulative distribution function of Generalised Pareto Distribution at x,
+#' with shape parameter alpha and scale parameter beta.
+#'
+#' @param x value at which the pdf is evaluated.
+#' @param alpha Shape parameter.
+#' @param beta Scale parameter, should be positive.
+#'
+#' @return GPD CDF function evaluated at x with shape and scale parameters respectively alpha and beta.
+#' @example plgpd(2.34, alpha = 1, beta = 2)
 plgpd <- function(x, alpha, beta, lower.tail=F){
   res <- 1-(1+x/beta)^{-alpha}
   if(lower.tail){
@@ -190,9 +275,24 @@ plgpd <- function(x, alpha, beta, lower.tail=F){
   return(res)
 }
 
-trf_jacobian <- function(z, alpha, beta, kappa, offset_scale, offset_shape){
+#' Computes determinant of Jacobian of Marginal Transform (MT) method.
+#'
+#' @param z GPD(offset_shape, offset_scale)-distributed data.
+#' @param alpha Shape parameter of output data.
+#' @param beta Part of scale parameter of output data (beta + kappa).
+#' Should be positive.
+#' @param kappa Part of scale parameter of output data.
+#' Should be positive.
+#' @param offset_scale Scale parameter of input data.
+#' Should be positive.
+#' @param offset_shape Shape parameter of input data.
+#' @return Transformed scale parameter given original data parameters.
+#'
+#' @example
+#' TrfJacobian(c(0.1, 0.2), 2, 3, 2, 1, 4)
+TrfJacobian <- function(z, alpha, beta, kappa, offset_scale, offset_shape){
   # TODO check whether it is numerically stable by division of pdfs
-  inv_g_z <- trf_inv_g(z = z, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
+  inv_g_z <- TrfInverseG(z = z, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
   res <- dlgpd(x = z, alpha = alpha, beta = beta+kappa) / dlgpd(x = inv_g_z, alpha = offset_shape, beta = offset_scale)
   return(res)
 }
@@ -215,22 +315,59 @@ library(evir)
 
 # Case 0-0
 
-pairwise_00_1 <- function(alpha, beta, kappa){
+#' Computes partial part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.
+#'
+#' @param alpha Shape parameter. Should be positive.
+#' @param beta Latent Gamma scale parameter. Should be positive.
+#' @param kappa Exceedance probability parameter. Should be positive.
+#'
+#' @return Partial part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.
+#' @example PairwiseZeroZero1(0.3, 2, 3)
+PairwiseZeroZero1 <- function(alpha, beta, kappa){
   return(-2 * (1 + kappa / beta)^{-alpha})
 }
 
-pairwise_00_2 <- function(t1, t2, alpha, beta, kappa, rho, B1, B2, B3){
+#' Computes second part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.
+#'
+#' @param t1 First timestamp.
+#' @param t2 Second timestamp.
+#' @param alpha Shape parameter. Should be positive.
+#' @param beta Latent Gamma scale parameter. Should be positive.
+#' @param kappa Exceedance probability parameter. Should be positive.
+#' @param rho Exponential trawl parameter. Should be positive.
+#' @param B1 Difference area between times \code{t1} and \code{t2}.
+#' @param B2 Intersection area between times \code{t1} and \code{t2}.
+#' @param B3 Difference area between times \code{t2} and \code{t1}.
+#'
+#' @return Second part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.
+#' @example PairwiseZeroZero2(t1=1, t2=4, 0.3, 2, 3, 0.2, 1.2, 3, 1.2)
+PairwiseZeroZero2 <- function(t1, t2, alpha, beta, kappa, rho, B1, B2, B3){
+  # TODO Remove dependency on rho
+  # TODO Remove either B1 or B3
   temp = (1 + 2 * kappa / beta)^{-alpha * rho * B2}
   return((1 + kappa / beta)^{-alpha * rho * (B1 + B3)} * temp)
 }
 
-pairwise_00_exp <- function(t1, t2, alpha, beta, kappa, rho){
-  B1 <- compute_B1_exp(rho, t1, t2)
-  B2 <- compute_B_inter_exp(rho, t1, t2)
+#' Computes latent trawl pairwise likelihood with \code{(x,y) = (0,0)} for Exponential
+#' Trawl funciton.
+#'
+#' @param t1 First timestamp.
+#' @param t2 Second timestamp.
+#' @param alpha Shape parameter. Should be positive.
+#' @param beta Latent Gamma scale parameter. Should be positive.
+#' @param kappa Exceedance probability parameter. Should be positive.
+#' @param rho Exponential trawl parameter. Should be non-negative.
+#'
+#' @return Second part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.
+#' @example PairwiseZeroZeroExp(t1=1, t2=4, 0.3, 2, 3, 0.2)
+PairwiseZeroZeroExp <- function(t1, t2, alpha, beta, kappa, rho){
+  if(rho < 0) stop('rho should be non-negative').
+  B1 <- ComputeB1Exp(rho, t1, t2)
+  B2 <- ComputeBInterExp(rho, t1, t2)
   B3 <- ComputeB3Exp(rho, t1, t2)
 
-  temp <- pairwise_00_1(alpha, beta, kappa)
-  temp <- temp + pairwise_00_2(t1, t2, alpha, beta, kappa, rho, B1, B2, B3)
+  temp <- PairwiseZeroZero1(alpha, beta, kappa)
+  temp <- temp + PairwiseZeroZero2(t1, t2, alpha, beta, kappa, rho, B1, B2, B3)
   return(1 + temp)
 }
 
@@ -241,23 +378,38 @@ alpha <- -1.0
 beta <- 10
 rho <- 1.0
 kappa <- 1.0
-B1 <- compute_B1_exp(rho, t1, t2)
-B2 <- compute_B_inter_exp(rho, t1, t2)
+B1 <- ComputeB1Exp(rho, t1, t2)
+B2 <- ComputeBInterExp(rho, t1, t2)
 B3 <- ComputeB3Exp(rho, t1, t2)
 
-pairwise_00_exp(t1 = t1, t2 = t2,
+PairwiseZeroZeroExp(t1 = t1, t2 = t2,
                 alpha = alpha, beta = beta,
                 kappa = kappa, rho = rho)
 answer <- 1 - 2 * (1 + 0.1) + (1 + 0.1)^{B1 + B3}*(1 + 0.2)^{B2}
 
 alpha <- 1.0
-pairwise_00_exp(t1 = t1, t2 = t2,
+PairwiseZeroZeroExp(t1 = t1, t2 = t2,
                 alpha = alpha, beta = beta,
                 kappa = kappa, rho = rho)
 answer <- 1 - 2 * (1 + 0.1)^{-1} + (1 + 0.1)^{-B1 - B3}*(1 + 0.2)^{-B2}
 answer
 
 # Case 1-0
+
+# TODO Remove dependency on rho
+
+#' Computes second part of latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}.
+#'
+#' @param t1 First timestamp.
+#' @param t2 Second timestamp.
+#' @param alpha Shape parameter. Should be positive.
+#' @param beta Latent Gamma scale parameter. Should be positive.
+#' @param kappa Exceedance probability parameter. Should be positive.
+#' @param rho Exponential trawl parameter. Should be positive.
+#' @param A
+#'
+#' @return Second part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.
+#' @example PairwiseZeroZero2(t1=1, t2=4, 0.3, 2, 3, 0.2, 1.2, 3, 1.2)
 pairwise_10_1 <- function(t1, x1, t2, alpha, beta, kappa, rho, trawlA){
   return(alpha * rho * trawlA / beta * (1 + (kappa + x1) / beta)^{-alpha * rho * trawlA - 1})
 }
@@ -291,17 +443,17 @@ pairwise_10_exp <- function(t1, x1, t2, alpha, beta, kappa, rho, transformation=
   # Marginal Transformation
   if(transformation){
     offset_shape <- n_moments + 1
-    offset_scale <- trf_find_offset_scale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
-    inv_x <- trf_inv_g(x1, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
-    jacobian <- trf_jacobian(z = x1, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
+    offset_scale <- TrfFindOffsetScale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
+    inv_x <- TrfInverseG(x1, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
+    jacobian <- TrfJacobian(z = x1, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
     new_x <- inv_x
   }else{
     new_x <- x1
   }
 
   trawlA <- ComputeAExp(rho)
-  B1 <- compute_B1_exp(rho, t1, t2)
-  B2 <- compute_B_inter_exp(rho, t1, t2)
+  B1 <- ComputeB1Exp(rho, t1, t2)
+  B2 <- ComputeBInterExp(rho, t1, t2)
   B3 <- ComputeB3Exp(rho, t1, t2)
 
 
@@ -329,8 +481,8 @@ alpha <- -1.0
 beta <- 10
 rho <- 1.0
 kappa <- 1.0
-B1 <- compute_B1_exp(rho, t1, t2)
-B2 <- compute_B_inter_exp(rho, t1, t2)
+B1 <- ComputeB1Exp(rho, t1, t2)
+B2 <- ComputeBInterExp(rho, t1, t2)
 B3 <- ComputeB3Exp(rho, t1, t2)
 
 pairwise_10_exp(t1 = t1, t2 = t2,
@@ -399,13 +551,13 @@ pairwise_11_exp <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, transformat
   # Marginal Transformation
   if(transformation){
     offset_shape <- n_moments + 1
-    offset_scale <- trf_find_offset_scale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
-    inv_x1 <- trf_inv_g(x1, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
-    inv_x2 <- trf_inv_g(x2, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
+    offset_scale <- TrfFindOffsetScale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
+    inv_x1 <- TrfInverseG(x1, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
+    inv_x2 <- TrfInverseG(x2, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
     new_x1 <- inv_x1
     new_x2 <- inv_x2
-    jacobian1 <- trf_jacobian(z = x1, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
-    jacobian2 <- trf_jacobian(z = x2, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
+    jacobian1 <- TrfJacobian(z = x1, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
+    jacobian2 <- TrfJacobian(z = x2, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
     temp <- jacobian1 * jacobian2
     #temp <- 1.0
     #temp <- 1/temp
@@ -420,8 +572,8 @@ pairwise_11_exp <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, transformat
   }
 
   trawlA <- ComputeAExp(rho)
-  B1 <- compute_B1_exp(rho, t1, t2)
-  B2 <- compute_B_inter_exp(rho, t1, t2)
+  B1 <- ComputeB1Exp(rho, t1, t2)
+  B2 <- ComputeBInterExp(rho, t1, t2)
   B3 <- ComputeB3Exp(rho, t1, t2)
 
   if(transformation){
@@ -445,8 +597,8 @@ alpha <- -1.0
 beta <- 10
 rho <- 1.0
 kappa <- 1.0
-B1 <- compute_B1_exp(rho, t1, t2)
-B2 <- compute_B_inter_exp(rho, t1, t2)
+B1 <- ComputeB1Exp(rho, t1, t2)
+B2 <- ComputeBInterExp(rho, t1, t2)
 B3 <- ComputeB3Exp(rho, t1, t2)
 
 pairwise_11_exp(t1 = t1, x1 = x1,
@@ -464,7 +616,7 @@ pairwise_likelihood_single_pair <- function(t1, x1, t2, x2, alpha, beta, kappa, 
   #print(x1)
   if(x1 < 1e-16){
     if(x2 < 1e-16){
-      return(pairwise_00_exp(t1, t2, alpha = 1, beta = 1, kappa, rho))
+      return(PairwiseZeroZeroExp(t1, t2, alpha = 1, beta = 1, kappa, rho))
     }else{
       return(pairwise_10_exp(t2, x2, t1, alpha, beta, kappa, rho, transformation, n_moments = 0))
     }
@@ -601,11 +753,11 @@ marginal_gpd_likelihood <- function(values, fixed_names, fixed_params, params, m
                     temp_beta <- params_all[2]
                     temp_kappa <- params_all[3]
                     offset_shape <- n_moments + 1
-                    offset_scale <- trf_find_offset_scale(alpha = temp_alpha, beta = temp_beta,
+                    offset_scale <- TrfFindOffsetScale(alpha = temp_alpha, beta = temp_beta,
                                                           kappa = temp_kappa, offset_shape = offset_shape)
-                    inv_x1 <- trf_inv_g(x1, alpha = temp_alpha, beta = temp_beta, kappa = temp_kappa,
+                    inv_x1 <- TrfInverseG(x1, alpha = temp_alpha, beta = temp_beta, kappa = temp_kappa,
                                         offset_scale = offset_scale, offset_shape = offset_shape)
-                    jacobian1 <- trf_jacobian(z = x1, alpha = temp_alpha, beta = temp_beta, kappa = temp_kappa,
+                    jacobian1 <- TrfJacobian(z = x1, alpha = temp_alpha, beta = temp_beta, kappa = temp_kappa,
                                               offset_scale = offset_scale, offset_shape = offset_shape)
                     temp <- jacobian1
                       return(dlgpd(x = inv_x1, alpha = offset_shape, beta = offset_scale+temp_kappa)*jacobian1)
