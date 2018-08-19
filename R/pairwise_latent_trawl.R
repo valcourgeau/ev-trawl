@@ -920,7 +920,14 @@ ParamsListFullPL <- function(times, values, delta, params, logscale=T, transform
 #' @param transformation Boolean to use the Marginal Transform (MT) method.
 #'
 #' @return FULL latent trawl pairwise likelihood with some (or none) parameters fixed.
-#' @example UnivariateFullPL(c(1,2,3,4,5), c(2,0,3,4,0), delta=2, c("alpha", "beta"), 0.3, 2, 3, 0.2, F)
+#' @example
+#' times <- c(1,2,3,4,5)
+#' values <- c(2,0,3,4,0)
+#' delta <- 2
+#' fixed_names <- c("alpha", "beta")
+#' params <- c(2.0, 3.4, 0.1, 4.3)
+#' model_vars_names <- c("alpha", "beta", "rho", "kappa")
+#' UnivariateFullPL(times, values, delta, fixed_names, params, model_vars_names, T, F)
 UnivariateFullPL <- function(times, values, delta, fixed_names, fixed_params, params, model_vars_names, logscale=T, transformation=F){
   if(length(fixed_names) > length(model_vars_names)) stop('Too many fixed parameters compared to number of model params.')
   if(length(fixed_params) + length(params) != length(model_vars_names)) stop('Wrong number of params compared to model specs.')
@@ -952,7 +959,28 @@ UnivariateFullPL <- function(times, values, delta, fixed_names, fixed_params, pa
                           transformation = transformation))
 }
 
-marginal_gpd_likelihood <- function(values, fixed_names, fixed_params, params, model_vars_names, logscale=T, transformation=F, n_moments=4){
+#' Computes Generalised Pareto (log-)likelihood on non-zero exceedances under independence.
+#'
+#' @param values Vector of target values.
+#' @param fixed_names Vector of literal names of parameters to keep fixed.
+#' @param fixed_params Vector of numerical values of fixed parameters.
+#' @param params List of parameters.
+#' @param model_vars_names Vector of all parameters names in the model.
+#' @param logscale Boolean to use logscale (log-likelihood). Default \code{T}.
+#' @param transformation Boolean to use the Marginal Transform (MT) method.
+#' @param n_moments Number of moments the transformed variables should have
+#' using the Marginal Transform (MT) method.
+#'
+#' @return Generalised Pareto (log-)likelihood on non-zero exceedances under independence.
+#' @example
+#' times <- c(1,2,3,4,5)
+#' values <- c(2,0,3,4,0)
+#' delta <- 2
+#' fixed_names <- c("alpha", "kappa")
+#' params <- c(2.0, 3.4, 0.1, 4.3)
+#' model_vars_names <- c("alpha", "beta", "rho", "kappa")
+#' UnivariateFullPL(times, values, delta, fixed_names, params, model_vars_names, T, F)
+MarginalGPDLikelihood <- function(values, fixed_names, fixed_params, params, model_vars_names, logscale=T, transformation=F, n_moments=4){
   if(length(fixed_names) > length(model_vars_names)) stop('Too many fixed parameters compared to number of model params.')
   if(length(fixed_params) + length(params) != length(model_vars_names)) stop('Wrong number of params compared to model specs.')
   if(length(fixed_params) != length(fixed_names)) stop('fixed_params and fixed_names should have same length.')
@@ -996,20 +1024,49 @@ marginal_gpd_likelihood <- function(values, fixed_names, fixed_params, params, m
   }
 }
 
-marginal_simple_lik <- function(values, params){
+#' Simplified marginal (GPD) log-likelihood function under independence in the
+#' exponential trawl case.
+#'
+#' @param values Exceedance values.
+#' @param params (at least) 2-d vector for GPD parameters
+#'
+#' @return Log-likelihood of GPD distribued variables (i.e. non-zero exceedances).
+#' @example MarginalSimpleLik(c(2.0, 0.3, 6.15, 0, 0.31), c(2.1, 1.17, 0.52, 4.17)) # for GPD(2.1, 1.17)
+MarginalSimpleLik <- function(values, params){
   alpha <- params[1]
   beta_kappa <- params[2]
   lik <- alpha / beta_kappa * (1+sign(alpha) * values / beta_kappa)^{-alpha-1}
-  return(sum(log(lik)))
+  return(sum(log(lik[lik>0])))
 }
 
-gpd_fit <- function(values, initial_guess){
-  fn_to_optim <- function(x){return(-marginal_simple_lik(values = values, params = x))}
-  ff <- optim(fn_to_optim, par = initial_guess, method = "L-BFGS-B", lower = c(0.1,0.1), upper = c(20,20))
+#' Generalised Pareto likelihood maximisation using L-BFGS-B optimisation routine.
+#'
+#' @param values Exceedance values.
+#' @param initial_guess (at least 2-d) Vector for GPD parameters starting values.
+#' @param lower Vector of lower bounds limits for optimisation procedure. Default \code{c(0.1, 0.1)}.
+#' @param upper Vector of upper bounds limits for optimisation procedure. Default \code{c(20, 20)}.
+#'
+#' @return Parameters of Log-likelihood maximisation of GPD distribued variables (i.e. non-zero exceedances).
+#' @example MarginalSimpleLik(c(2.0, 0.3, 6.15, 0, 0.31), c(2.1, 1.17, 0.52, 4.17))
+GPDFit <- function(values, initial_guess, lower=c(0.1, 0.1), upper=c(20, 20)){
+  fn_to_optim <- function(x){return(-MarginalSimpleLik(values = values, params = x))}
+  ff <- optim(fn_to_optim, par = initial_guess, method = "L-BFGS-B", lower = lower, upper = upper)
   return(ff$par)
 }
 
-mom_gpd <- function(values_array){
+#' Method of moments (MoM) on a one or multiple exceedance timeseries for the
+#' latent trawl model using marginal GPD properties and probability of exceedance.
+#'
+#' @param values_array Matrix of exceedance timeseries
+#'
+#' @return Parameters given by a second-order method of moments as well as standard deviation across
+#' timeseries for each individual parameter.
+#' @example
+#' exceed1 <- c(0.1, 0, 0.2, 0, 0, 0, 0.6, 1.5)
+#' exceed2 <- c(0, 0.3, 5.2, 0, 0, 3.0, 0, 2.2)
+#' val_array <- cbind(exceed1, exceed2)
+#' MoMGPD(val_array)
+MoMGPD <- function(values_array){
   # workds under the assumption that alpha > 2
   # values_array contains the time series with first axis as time and second as # of time series
   n_dim <- length(values_array[1,])
