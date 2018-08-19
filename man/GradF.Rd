@@ -13,6 +13,9 @@ GradF(f, params, epsilon = 1e-06)
 
 \item{epsilon}{Offset value for all components.}
 }
+\value{
+Gradient of function \code{f} at parameters \code{params} with offset \code{epsilon}.
+}
 \description{
 Computes gradident of a function given parameters and offset value epsilon.
 }

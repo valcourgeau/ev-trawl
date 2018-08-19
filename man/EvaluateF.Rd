@@ -13,6 +13,9 @@ EvaluateF(f, params, epsilon)
 
 \item{epsilon}{Offset value to add to all component of \code{params}.}
 }
+\value{
+Evaluate of function \code{f} at parameters \code{params} with offset \code{epsilon}.
+}
 \description{
 Evalutae function at given parameters.
 }

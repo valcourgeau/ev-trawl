@@ -361,7 +361,7 @@ PairwiseZeroZero2 <- function(t1, t2, alpha, beta, kappa, rho, B1, B2, B3){
 #' @return Second part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.
 #' @example PairwiseZeroZeroExp(t1=1, t2=4, 0.3, 2, 3, 0.2)
 PairwiseZeroZeroExp <- function(t1, t2, alpha, beta, kappa, rho){
-  if(rho < 0) stop('rho should be non-negative').
+  if(rho < 0) stop('rho should be non-negative')
   B1 <- ComputeB1Exp(rho, t1, t2)
   B2 <- ComputeBInterExp(rho, t1, t2)
   B3 <- ComputeB3Exp(rho, t1, t2)

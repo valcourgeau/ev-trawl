@@ -2,7 +2,7 @@
 % Please edit documentation in R/differentiate.R
 \name{HessianF}
 \alias{HessianF}
-\title{Computes Hessian matrix of a function given parameters and offset value epsilon.}
+\title{Computes Hessian matrix of a $C^2$ function given parameters and offset value epsilon}
 \usage{
 HessianF(f, params, epsilon = 1e-06)
 }
@@ -13,8 +13,11 @@ HessianF(f, params, epsilon = 1e-06)
 
 \item{epsilon}{Offset value for all components.}
 }
+\value{
+Hessian matrix of function \code{f} at parameters \code{params} with offset \code{epsilon}.
+}
 \description{
-Computes Hessian matrix of a function given parameters and offset value epsilon.
+Computes Hessian matrix of a $C^2$ function given parameters and offset value epsilon
 }
 \examples{
 HessianF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 1e-6)
