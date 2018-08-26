@@ -237,6 +237,30 @@ test_that("Pairwise 1-0 Exp",{
   expect_equal(val, answer)
 })
 
+test_that("Pairwise 1-1", {
+  # Example
+  t1 <- 0.0
+  t2 <- 1.0
+  x1 <- 1.0
+  x2 <- 2.0
+  alpha <- -1.0
+  beta <- 10
+  rho <- 1.0
+  kappa <- 1.0
+  B1 <- ComputeB1Exp(rho, t1, t2)
+  B2 <- ComputeBInterExp(rho, t1, t2)
+  B3 <- ComputeB3Exp(rho, t1, t2)
+
+  val <- PairwiseOneOne(t1 = t1, x1 = x1,
+                  t2 = t2, x2 = x2,
+                  alpha = alpha, beta = beta,
+                  rho = rho, kappa = kappa)
+
+  answer <- 1/100*(1+0.2)^{B1-1}*(1+0.5)^{B2-1}*(1+3/10)^{B3-1}
+  answer <- answer * (B1*B2*(1+0.5)*(1+0.3)+B1*B3*(1+0.5)^2
+                      +B2*(B2-1)*(1+0.2)*(1+0.3)+B2*B3*(1+0.2)*(1+0.5))
+  expect_equal(answer, val)
+})
 
 
 

@@ -284,29 +284,6 @@ PairwiseZeroZeroExp <- function(t1, t2, alpha, beta, kappa, rho){
   return(1 + temp)
 }
 
-# Example
-t1 <- 0.0
-t2 <- 1.0
-alpha <- -1.0
-beta <- 10
-rho <- 1.0
-kappa <- 1.0
-B1 <- ComputeB1Exp(rho, t1, t2)
-B2 <- ComputeBInterExp(rho, t1, t2)
-B3 <- ComputeB3Exp(rho, t1, t2)
-
-PairwiseZeroZeroExp(t1 = t1, t2 = t2,
-                alpha = alpha, beta = beta,
-                kappa = kappa, rho = rho)
-answer <- 1 - 2 * (1 + 0.1) + (1 + 0.1)^{B1 + B3}*(1 + 0.2)^{B2}
-
-alpha <- 1.0
-PairwiseZeroZeroExp(t1 = t1, t2 = t2,
-                alpha = alpha, beta = beta,
-                kappa = kappa, rho = rho)
-answer <- 1 - 2 * (1 + 0.1)^{-1} + (1 + 0.1)^{-B1 - B3}*(1 + 0.2)^{-B2}
-answer
-
 # Case 1-0
 
 # TODO Remove dependency on rho
@@ -575,7 +552,8 @@ pairwise_11_2_4 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B2, B3){
   return(B2*B3*(1+(kappa+x1)/beta)*(1+(2*kappa+x1+x2)/beta))
 }
 
-#' Computes second term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}.
+#' Computes second term in latent trawl pairwise likelihood with \code{(x,x)}
+#' where \code{x > 0} and \code{y > 0}.
 #'
 #' @param t1 First timestamp.
 #' @param x1 Positive value corresponding to \code{t1}.
@@ -589,7 +567,8 @@ pairwise_11_2_4 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B2, B3){
 #' @param B2 Intersection area between \code{t1} and \code{t2} (in this order).
 #' @param B3 Difference area between \code{t2} and \code{t1} (in this order).
 #'
-#' @return Second term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}.
+#' @return Second term in latent trawl pairwise likelihood with \code{(x,x)}
+#'   where \code{x > 0} and \code{y > 0}.
 #' @example PairwiseOneOne2(t1=1, x1=0.5, t2=4, 0.3, 2, 3, 0.2, 3, 3, 2)
 PairwiseOneOne2 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B2, B3){
   temp <- pairwise_11_2_1(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B2)
@@ -599,8 +578,8 @@ PairwiseOneOne2 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B2, B3)
   return(temp)
 }
 
-#' Computes latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}
-#' with exponential trawl function.
+#' Computes latent trawl pairwise likelihood with \code{(x,x)} where
+#' \code{x > 0} and \code{y > 0} with exponential trawl function.
 #'
 #' @param t1 First timestamp.
 #' @param x1 Positive value corresponding to \code{t1}.
@@ -611,21 +590,28 @@ PairwiseOneOne2 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B2, B3)
 #' @param kappa Exceedance probability parameter. Should be positive.
 #' @param rho Exponential trawl parameter. Should be positive.
 #' @param transformation Boolean to use the Marginal Transform (MT) method.
-#' @param n_moments Number of moments achieved by transformed GPD marginals, if used.
+#' @param n_moments Number of moments achieved by transformed GPD marginals, if
+#'   used.
 #'
-#' @return Latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}.
-#' @example PairwiseOneOne2(t1=1, x1=0.5, t2=4, 0.3, 2, 3, 0.2, T, 4)
-pairwise_11_exp <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, transformation=F, n_moments=4){
+#' @return Latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0}
+#'   and \code{y > 0}.
+#' @example PairwiseOneOne(t1=1, x1=0.5, t2=4, x2=0.3, alpha=2, beta=3,
+#'   kappa=3.5, rho=0.2, T, 4)
+PairwiseOneOne <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, transformation=F, n_moments=4){
   # Marginal Transformation
   if(transformation){
     offset_shape <- n_moments + 1
     offset_scale <- TrfFindOffsetScale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
-    inv_x1 <- TrfInverseG(x1, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
-    inv_x2 <- TrfInverseG(x2, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
+    inv_x1 <- TrfInverseG(x1, alpha = alpha, beta = beta, kappa = kappa,
+                          offset_scale = offset_scale, offset_shape = offset_shape)
+    inv_x2 <- TrfInverseG(x2, alpha = alpha, beta = beta, kappa = kappa,
+                          offset_scale = offset_scale, offset_shape = offset_shape)
     new_x1 <- inv_x1
     new_x2 <- inv_x2
-    jacobian1 <- TrfJacobian(z = x1, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
-    jacobian2 <- TrfJacobian(z = x2, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
+    jacobian1 <- TrfJacobian(z = x1, alpha = alpha, beta = beta, kappa = kappa,
+                             offset_scale = offset_scale, offset_shape = offset_shape)
+    jacobian2 <- TrfJacobian(z = x2, alpha = alpha, beta = beta, kappa = kappa,
+                             offset_scale = offset_scale, offset_shape = offset_shape)
     temp <- jacobian1 * jacobian2
     #temp <- 1.0
     #temp <- 1/temp
@@ -645,41 +631,24 @@ pairwise_11_exp <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, transformat
   B3 <- ComputeB3Exp(rho, t1, t2)
 
   if(transformation){
-    temp <- temp * PairwiseOneOne1(t1, new_x1, t2, new_x2, alpha = offset_shape, beta = 1, kappa, rho, B1, B2, B3)
-    temp <- temp * PairwiseOneOne2(t1, new_x1, t2, new_x2, alpha = offset_shape, beta = 1, kappa, rho, B1, B2, B3)
+    temp <- temp * PairwiseOneOne1(t1, new_x1, t2, new_x2,
+                                   alpha = offset_shape, beta = 1, kappa, rho, B1, B2, B3)
+    temp <- temp * PairwiseOneOne2(t1, new_x1, t2, new_x2,
+                                   alpha = offset_shape, beta = 1, kappa, rho, B1, B2, B3)
   }else{
-    temp <- temp * PairwiseOneOne1(t1, new_x1, t2, new_x2, alpha, beta, kappa, rho, B1, B2, B3)
-    temp <- temp * PairwiseOneOne2(t1, new_x1, t2, new_x2, alpha, beta, kappa, rho, B1, B2, B3)
+    temp <- temp * PairwiseOneOne1(t1, new_x1, t2, new_x2,
+                                   alpha, beta, kappa, rho, B1, B2, B3)
+    temp <- temp * PairwiseOneOne2(t1, new_x1, t2, new_x2,
+                                   alpha, beta, kappa, rho, B1, B2, B3)
   }
 
   return(temp)
 }
 
-# Example
-t1 <- 0.0
-t2 <- 1.0
-x1 <- 1.0
-x2 <- 2.0
-alpha <- -1.0
-beta <- 10
-rho <- 1.0
-kappa <- 1.0
-B1 <- ComputeB1Exp(rho, t1, t2)
-B2 <- ComputeBInterExp(rho, t1, t2)
-B3 <- ComputeB3Exp(rho, t1, t2)
 
-pairwise_11_exp(t1 = t1, x1 = x1,
-                t2 = t2, x2 = x2,
-                alpha = alpha, beta = beta,
-                rho = rho, kappa = kappa)
 
-answer <- 1/100*(1+0.2)^{B1-1}*(1+0.5)^{B2-1}*(1+3/10)^{B3-1}
-answer <- answer * (B1*B2*(1+0.5)*(1+0.3)+B1*B3*(1+0.5)^2
-  +B2*(B2-1)*(1+0.2)*(1+0.3)+B2*B3*(1+0.2)*(1+0.5))
-answer
-
-#' Computes correct latent trawl SINGLE pairwise likelihood depending on the values of \code{(x1,x2)}
-#' with exponential trawl function.
+#' Computes correct latent trawl SINGLE pairwise likelihood depending on the
+#' values of \code{(x1,x2)} with exponential trawl function.
 #'
 #' @param t1 First timestamp.
 #' @param x1 Positive value corresponding to \code{t1}.
@@ -706,7 +675,7 @@ SinglePairPL <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, transformation
     if(x2 < 1e-16){
       return(PairwiseOneZeroExp(t1, x1, t2, alpha, beta, kappa, rho, transformation, n_moments = 0))
     }else{
-      return(pairwise_11_exp(t1, x1, t2, x2, alpha, beta, kappa, rho, transformation, n_moments = 0))
+      return(PairwiseOneOne(t1, x1, t2, x2, alpha, beta, kappa, rho, transformation, n_moments = 0))
     }
   }
 }
@@ -715,7 +684,8 @@ SinglePairPL <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, transformation
 SinglePairPL(0.1, 2.0, 0.3, 5.0, 2., 3., 30, 0.3, F)
 SinglePairPL(0.1, 2.0, 0.3, 1.0, -2., 3., 30, 0.3, T)
 
-#' Computes latent trawl FULL pairwise likelihood depending with exponential trawl function.
+#' Computes latent trawl FULL pairwise likelihood depending with exponential
+#' trawl function.
 #'
 #' @param times Vector of timestamps.
 #' @param values Vector of target values.
@@ -723,7 +693,8 @@ SinglePairPL(0.1, 2.0, 0.3, 1.0, -2., 3., 30, 0.3, T)
 #' @param beta Latent Gamma scale parameter. Should be positive.
 #' @param kappa Exceedance probability parameter. Should be positive.
 #' @param rho Exponential trawl parameter. Should be positive.
-#' @param delta Maximum depth of pairwise likelihood blocks. Should be positive natural integer.
+#' @param delta Maximum depth of pairwise likelihood blocks. Should be positive
+#'   natural integer.
 #' @param logscale Boolean to use logscale (log-likelihood). Default \code{T}.
 #' @param transformation Boolean to use the Marginal Transform (MT) method.
 #'
