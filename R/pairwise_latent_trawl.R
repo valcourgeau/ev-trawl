@@ -273,11 +273,17 @@ PairwiseZeroZero2 <- function(t1, t2, alpha, beta, kappa, rho, B1, B2, B3){
 #'
 #' @return Second part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.
 #' @example PairwiseZeroZeroExp(t1=1, t2=4, 0.3, 2, 3, 0.2)
-PairwiseZeroZeroExp <- function(t1, t2, alpha, beta, kappa, rho){
+PairwiseZeroZeroExp <- function(t1, t2, alpha, beta, kappa, rho, transformation=F, n.moments=0){
   if(rho < 0) stop('rho should be non-negative')
   B1 <- ComputeB1Exp(rho, t1, t2)
   B2 <- ComputeBInterExp(rho, t1, t2)
   B3 <- ComputeB3Exp(rho, t1, t2)
+
+  if(transformation){
+    alpha <- n.moments+1
+    beta <- 1
+  }
+
 
   temp <- PairwiseZeroZero1(alpha, beta, kappa)
   temp <- temp + PairwiseZeroZero2(t1, t2, alpha, beta, kappa, rho, B1, B2, B3)
@@ -531,24 +537,24 @@ PairwiseOneOne1 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B2, B3)
 }
 
 #' See PairwiseOneOne2 for description.
-pairwise_11_2_1 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B2){
+PairwiseOneOne21 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B2){
   return(B1*B2*(1+(2*kappa+x1+x2)/beta)*(1+(kappa+x2)/beta))
 }
 
 #' See PairwiseOneOne2 for description.
-pairwise_11_2_2 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B3){
+PairwiseOneOne22 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B3){
   return(B1*B3*(1+(2*kappa+x1+x2)/beta)^2)
 }
 
 #' See PairwiseOneOne2 for description.
-pairwise_11_2_3 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B2){
+PairwiseOneOne23 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B2){
   temp <- B2*(B2+1/(alpha*rho))
   temp <- temp*(1+(kappa+x1)/beta)*(1+(kappa+x2)/beta)
   return(temp)
 }
 
 #' See PairwiseOneOne2 for description.
-pairwise_11_2_4 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B2, B3){
+PairwiseOneOne24 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B2, B3){
   return(B2*B3*(1+(kappa+x1)/beta)*(1+(2*kappa+x1+x2)/beta))
 }
 
@@ -571,10 +577,10 @@ pairwise_11_2_4 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B2, B3){
 #'   where \code{x > 0} and \code{y > 0}.
 #' @example PairwiseOneOne2(t1=1, x1=0.5, t2=4, 0.3, 2, 3, 0.2, 3, 3, 2)
 PairwiseOneOne2 <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B2, B3){
-  temp <- pairwise_11_2_1(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B2)
-  temp <- temp + pairwise_11_2_2(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B3)
-  temp <- temp + pairwise_11_2_3(t1, x1, t2, x2, alpha, beta, kappa, rho, B2)
-  temp <- temp + pairwise_11_2_4(t1, x1, t2, x2, alpha, beta, kappa, rho, B2, B3)
+  temp <- PairwiseOneOne21(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B2)
+  temp <- temp + PairwiseOneOne22(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B3)
+  temp <- temp + PairwiseOneOne23(t1, x1, t2, x2, alpha, beta, kappa, rho, B2)
+  temp <- temp + PairwiseOneOne24(t1, x1, t2, x2, alpha, beta, kappa, rho, B2, B3)
   return(temp)
 }
 
@@ -622,7 +628,7 @@ PairwiseOneOne <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, transformati
   }
 
   if(temp == 0.0 || is.na(temp) || is.nan(temp)){
-    temp <- 1e-16
+    temp <- .Machine$double.eps
   }
 
   trawlA <- ComputeAExp(rho)
@@ -659,30 +665,29 @@ PairwiseOneOne <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, transformati
 #' @param kappa Exceedance probability parameter. Should be positive.
 #' @param rho Exponential trawl parameter. Should be positive.
 #' @param transformation Boolean to use the Marginal Transform (MT) method.
+#' @param n.moments Number of finite moments for transformed marginals.
 #'
 #' @return SINGLE latent trawl pairwise likelihood depending on \code{(x1,x2)}.
-#' @example SinglePairPL(t1=1, x1=0.5, t2=4, 0.3, 2, 3, 0.2, F)
-SinglePairPL <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, transformation=F){
+#' @examples SinglePairPL(t1=1, x1=0.5, t2=4, alpha=0.3, beta=2, kappa3, rho=0.2, F)
+#' SinglePairPL(t1=0.1, x1=2.0, t2=0.3, x2=1.0, alpha=-2., beta=3., kappa=3, rho=0.3, T)
+SinglePairPL <- function(t1, x1, t2, x2, alpha, beta, kappa, rho, transformation=F, n.moments=0){
   # TODO check whether t1 should be <= t2 or not
   #print(x1)
-  if(x1 < 1e-16){
-    if(x2 < 1e-16){
-      return(PairwiseZeroZeroExp(t1, t2, alpha = 1, beta = 1, kappa, rho))
+
+  if(x1 < .Machine$double.eps){
+    if(x2 < .Machine$double.eps){
+      return(PairwiseZeroZeroExp(t1, t2, alpha = alpha, beta = beta, kappa, rho))
     }else{
-      return(PairwiseOneZeroExp(t2, x2, t1, alpha, beta, kappa, rho, transformation, n_moments = 0))
+      return(PairwiseOneZeroExp(t2, x2, t1, alpha, beta, kappa, rho, transformation, n_moments = n.moments))
     }
   }else{
-    if(x2 < 1e-16){
-      return(PairwiseOneZeroExp(t1, x1, t2, alpha, beta, kappa, rho, transformation, n_moments = 0))
+    if(x2 < .Machine$double.eps){
+      return(PairwiseOneZeroExp(t1, x1, t2, alpha, beta, kappa, rho, transformation, n_moments = n.moments))
     }else{
-      return(PairwiseOneOne(t1, x1, t2, x2, alpha, beta, kappa, rho, transformation, n_moments = 0))
+      return(PairwiseOneOne(t1, x1, t2, x2, alpha, beta, kappa, rho, transformation, n_moments = n.moments))
     }
   }
 }
-
-# Example
-SinglePairPL(0.1, 2.0, 0.3, 5.0, 2., 3., 30, 0.3, F)
-SinglePairPL(0.1, 2.0, 0.3, 1.0, -2., 3., 30, 0.3, T)
 
 #' Computes latent trawl FULL pairwise likelihood depending with exponential
 #' trawl function.
@@ -698,7 +703,7 @@ SinglePairPL(0.1, 2.0, 0.3, 1.0, -2., 3., 30, 0.3, T)
 #' @param logscale Boolean to use logscale (log-likelihood). Default \code{T}.
 #' @param transformation Boolean to use the Marginal Transform (MT) method.
 #'
-#' @return FULL latent trawl pairwise likelihood.
+#' @return Full latent trawl pairwise likelihood.
 #' @example FullPL(t1=1, x1=0.5, t2=4, 0.3, 2, 3, 0.2, F)
 FullPL <- function(times, values, alpha, beta, kappa, rho, delta, logscale=T, transformation=F){
   ok_ind <- which(!is.na(values))

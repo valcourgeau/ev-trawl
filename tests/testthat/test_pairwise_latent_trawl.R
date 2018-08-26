@@ -180,6 +180,9 @@ test_that("TrfInverseG correctly transforms data w.r.t shape parameter", {
   #expect_true(beta.ci[1] <= (offset_scale) & (offset_scale) <= beta.ci[2])
 })
 
+
+
+
 context("Pairwise terms")
 test_that("Pairwise 0-0 Exp",{
   t1 <- 0.0
@@ -262,6 +265,84 @@ test_that("Pairwise 1-1", {
   expect_equal(answer, val)
 })
 
+context("Pairwise likelihood computation")
+test_that("Single PL term", {
+  t1 <- 1
+  t2 <- 5
+
+  alpha <- 5
+  beta <- 3
+  kappa <- 2
+  rho <- 0.2
+
+  # 0-0
+  x1 <- 0
+  x2 <- 0
+  val <- SinglePairPL(t1 = t1, x1 = x1, t2 = t2, x2 = x2, alpha = alpha,
+                      beta = beta, kappa = kappa, rho = rho, transformation = F)
+  answer <- PairwiseZeroZeroExp(t1 = t1, t2 = t2, alpha = alpha,
+                               beta = beta, kappa = kappa, rho = rho)
+  expect_equal(val, answer)
+
+  # 1-0
+  x1 <- 2
+  x2 <- 0
+  val <- SinglePairPL(t1 = t1, x1 = x1, t2 = t2, x2 = x2, alpha = alpha,
+                      beta = beta, kappa = kappa, rho = rho, transformation = F)
+  answer <- PairwiseOneZeroExp(t1 = t1, x1 = x1, t2 = t2, alpha = alpha,
+                               beta = beta, kappa = kappa, rho = rho, transformation = F,
+                               n_moments = 0)
+  expect_equal(val, answer)
+
+  # 1-1
+  x1 <- 2
+  x2 <- 5
+  val <- SinglePairPL(t1 = t1, x1 = x1, t2 = t2, x2 = x2, alpha = alpha,
+                      beta = beta, kappa = kappa, rho = rho, transformation = F)
+  answer <- PairwiseOneOne(t1 = t1, x1 = x1, t2 = t2, x2 = x2, alpha = alpha,
+                               beta = beta, kappa = kappa, rho = rho, transformation = F,
+                               n_moments = 0)
+  expect_equal(val, answer)
+})
+
+test_that("Single PL term with transformation", {
+  t1 <- 1
+  t2 <- 5
+
+  alpha <- -5
+  beta <- 3
+  kappa <- 2
+  rho <- 0.2
+
+  # 0-0
+  x1 <- 0
+  x2 <- 0
+  val <- SinglePairPL(t1 = t1, x1 = x1, t2 = t2, x2 = x2, alpha = alpha,
+                      beta = beta, kappa = kappa, rho = rho, transformation = T, n.moments = 0)
+  answer <- PairwiseZeroZeroExp(t1 = t1, t2 = t2, alpha = alpha,
+                                beta = beta, kappa = kappa, rho = rho)
+  expect_equal(val, answer)
+
+  # 1-0
+  x1 <- 2
+  x2 <- 0
+  val <- SinglePairPL(t1 = t1, x1 = x1, t2 = t2, x2 = x2, alpha = alpha,
+                      beta = beta, kappa = kappa, rho = rho, transformation = T, n.moments = 0)
+  answer <- PairwiseOneZeroExp(t1 = t1, x1 = x1, t2 = t2, alpha = alpha,
+                               beta = beta, kappa = kappa, rho = rho, transformation = T,
+                               n_moments = 0)
+  expect_equal(val, answer)
+
+  # 1-1
+  x1 <- 2
+  x2 <- 5
+  val <- SinglePairPL(t1 = t1, x1 = x1, t2 = t2, x2 = x2, alpha = alpha,
+                      beta = beta, kappa = kappa, rho = rho, transformation = T, n.moments = 0)
+  answer <- PairwiseOneOne(t1 = t1, x1 = x1, t2 = t2, x2 = x2, alpha = alpha,
+                           beta = beta, kappa = kappa, rho = rho, transformation = T,
+                           n_moments = 0)
+  expect_equal(val, answer)
+})
 
 
 
