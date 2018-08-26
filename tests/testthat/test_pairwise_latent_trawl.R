@@ -1,0 +1,243 @@
+context("Slice Area")
+#source("./R/pairwise_latent_trawl.R")
+library("evir")
+
+test_that("rho must be non-negative in exp trawl",
+          {
+            rho <- -1
+            expect_that(ComputeAExp(rho), throws_error())
+          })
+
+test_that("B1 should be non-negative",
+          {
+            rho <- 0.2
+            t1 <- 5
+            t2 <- 10
+            expect_gte(ComputeB1Exp(rho, t1, t2), 0.0)
+            expect_gte(ComputeB1Exp(rho, t2, t1), 0.0)
+          })
+
+test_that("B3 should be non-negative",
+          {
+            rho <- 0.2
+            t1 <- 5
+            t2 <- 10
+            expect_gte(ComputeB3Exp(rho, t1, t2), 0.0)
+            expect_gte(ComputeB3Exp(rho, t2, t1), 0.0)
+          })
+
+test_that("B2 (intersection) should be non-negative",
+          {
+            rho <- 0.2
+            t1 <- 5
+            t2 <- 10
+            expect_gte(ComputeBInterExp(rho, t1, t2), 0.0)
+            expect_gte(ComputeBInterExp(rho, t2, t1), 0.0)
+          })
+
+test_that("B1 and B3 should be equal under timestamps swap",
+          {
+            rho <- 0.2
+            t1 <- 5
+            t2 <- 10
+            expect_equal(ComputeB1Exp(rho, t1, t2), ComputeB3Exp(rho, t2, t1))
+          })
+
+
+context("Marginal Transform trick")
+test_that("TrfG and TrfInverseG are the inverse of one another", {
+  alpha <- 3
+  beta <- 4
+  kappa <- 6
+
+  offset_scale <- 5
+  offset_shape <- 2
+
+  xs <- seq(from = 0.0, to = 500, length.out = 1000)
+  g.function <- function(x){TrfG(x = x, alpha = alpha, beta = beta,
+             kappa = kappa, offset_scale = offset_scale,
+             offset_shape = offset_shape)}
+  inv.g.function <- function(z){TrfInverseG(z = z, alpha = alpha, beta = beta,
+                                 kappa = kappa, offset_scale = offset_scale,
+                                 offset_shape = offset_shape)}
+
+  zs <- xs %>% g.function() %>% inv.g.function()
+  expect_equal(zs, xs)
+
+  zs <- xs %>% inv.g.function() %>% g.function()
+  expect_equal(zs, xs)
+  # alpha < 0
+  g.function <- function(x){TrfG(x = x, alpha = -alpha, beta = beta,
+                                 kappa = kappa, offset_scale = offset_scale,
+                                 offset_shape = offset_shape)}
+  inv.g.function <- function(z){TrfInverseG(z = z, alpha = -alpha, beta = beta,
+                                            kappa = kappa, offset_scale = offset_scale,
+                                            offset_shape = offset_shape)}
+
+  zs <- xs %>% g.function() %>% inv.g.function()
+  expect_equal(zs, xs)
+
+  xs <- seq(from = 0.0, to = 10, length.out = 1000)
+  zs <- xs %>% inv.g.function() %>% g.function()
+  expect_equal(zs, xs)
+})
+
+
+test_that("TrfG correctly transforms data w.r.t shape parameter", {
+  set.seed(42)
+
+  alpha <- 3
+  beta <- 4
+  kappa <- 6
+
+  offset_shape <- 5
+  offset_scale <- 2
+
+  n.sample <- 10000
+
+  test.samples <- rgpd(n = n.sample, xi = 1/offset_shape, beta = offset_scale)
+  trf.samples <- TrfG(test.samples, alpha=alpha, beta=beta, kappa=kappa,
+                             offset_scale=offset_scale, offset_shape=offset_shape)
+
+  fit.gpd <- evir::gpd(data = trf.samples, threshold = 0.0, method = "ml")
+  xi.fit <- fit.gpd$par.ests[1]
+  beta.fit <- fit.gpd$par.ests[2]
+  xi.fit.ses <- fit.gpd$par.ses[1]
+  beta.fit.ses <- fit.gpd$par.ses[2]
+  xi.ci <- xi.fit  + c(-3, 3) * sqrt(xi.fit.ses)
+  #beta.ci <- beta.fit + c(-3, 3) * sqrt(xi.fit.ses)
+
+  expect_true(xi.ci[1] <= 1/alpha & 1/alpha <= xi.ci[2])
+  #expect_true(beta.ci[1] <= (offset_scale) & (offset_scale) <= beta.ci[2])
+
+  # alpha < 0
+#   alpha <- -2
+#   n.sample <- 10000
+#
+#   test.samples <- rgpd(n = n.sample, xi = 1/offset_shape, beta = offset_scale)
+#   trf.samples <- TrfG(test.samples, alpha=alpha, beta=beta, kappa=kappa,
+#                       offset_scale=offset_scale, offset_shape=offset_shape)
+#   trf.samples <- trf.samples[!is.nan(trf.samples)]
+#   fit.gpd <- evir::gpd(data = trf.samples, threshold = 0.0, method = "ml")
+#   xi.fit <- fit.gpd$par.ests[1]
+#   beta.fit <- fit.gpd$par.ests[2]
+#   xi.fit.ses <- fit.gpd$par.ses[1]
+#   beta.fit.ses <- fit.gpd$par.ses[2]
+#   xi.ci <- xi.fit  + c(-3, 3) * sqrt(xi.fit.ses)
+#   #beta.ci <- beta.fit + c(-3, 3) * sqrt(xi.fit.ses)
+#   print(xi.ci)
+#   expect_true(xi.ci[1] <= 1/alpha & 1/alpha <= xi.ci[2])
+#   #expect_true(beta.ci[1] <= (offset_scale) & (offset_scale) <= beta.ci[2])
+})
+
+
+test_that("TrfInverseG correctly transforms data w.r.t shape parameter", {
+  set.seed(42)
+
+  # testing with alpha > 0
+  alpha <- 3
+  beta <- 4
+  kappa <- 6
+
+  offset_shape <- 5
+  offset_scale <- 2
+
+  n.sample <- 10000
+
+  test.samples <- rgpd(n = n.sample, xi = 1/alpha, beta = beta+kappa)
+  trf.samples <- TrfInverseG(test.samples, alpha=alpha, beta=beta, kappa=kappa,
+                             offset_scale=offset_scale, offset_shape=offset_shape)
+
+  fit.gpd <- evir::gpd(data = trf.samples, threshold = 0.0, method = "ml")
+  xi.fit <- fit.gpd$par.ests[1]
+  beta.fit <- fit.gpd$par.ests[2]
+  xi.fit.ses <- fit.gpd$par.ses[1]
+  beta.fit.ses <- fit.gpd$par.ses[2]
+  xi.ci <- xi.fit  + c(-3, 3) * sqrt(xi.fit.ses) # create CI around xi
+  #beta.ci <- beta.fit + c(-3, 3) * sqrt(xi.fit.ses)
+
+  expect_true(xi.ci[1] <= 1/offset_shape & 1/offset_shape <= xi.ci[2])
+  #expect_true(beta.ci[1] <= (offset_scale) & (offset_scale) <= beta.ci[2])
+
+  # testing with alpha < 0
+  alpha <- -3
+  n.sample <- 5000
+
+  test.samples <- rgpd(n = n.sample, xi = 1/alpha, beta = beta+kappa)
+  trf.samples <- TrfInverseG(test.samples, alpha=alpha, beta=beta, kappa=kappa,
+                             offset_scale=offset_scale, offset_shape=offset_shape)
+  trf.samples <- trf.samples[!is.nan(trf.samples)]
+
+  fit.gpd <- evir::gpd(data = trf.samples, threshold = 0.0, method = "ml")
+  xi.fit <- fit.gpd$par.ests[1]
+  beta.fit <- fit.gpd$par.ests[2]
+  xi.fit.ses <- fit.gpd$par.ses[1]
+  beta.fit.ses <- fit.gpd$par.ses[2]
+  xi.ci <- xi.fit  + c(-3, 3) * sqrt(xi.fit.ses) # create CI around xi
+  #beta.ci <- beta.fit + c(-3, 3) * sqrt(xi.fit.ses)
+
+  expect_true(xi.ci[1] <= 1/offset_shape & 1/offset_shape <= xi.ci[2])
+  #expect_true(beta.ci[1] <= (offset_scale) & (offset_scale) <= beta.ci[2])
+})
+
+context("Pairwise terms")
+test_that("Pairwise 0-0 Exp",{
+  t1 <- 0.0
+  t2 <- 1.0
+  alpha <- -1.0
+  beta <- 10
+  rho <- 1.0
+  kappa <- 1.0
+  B1 <- ComputeB1Exp(rho, t1, t2)
+  B2 <- ComputeBInterExp(rho, t1, t2)
+  B3 <- ComputeB3Exp(rho, t1, t2)
+
+  val <- PairwiseZeroZeroExp(t1 = t1, t2 = t2,
+                      alpha = alpha, beta = beta,
+                      kappa = kappa, rho = rho)
+  answer <- 1 - 2 * (1 + 0.1) + (1 + 0.1)^{B1 + B3}*(1 + 0.2)^{B2}
+  expect_equal(val, answer)
+
+  # alpha > 0
+  alpha <- 1.0
+  val <- PairwiseZeroZeroExp(t1 = t1, t2 = t2,
+                      alpha = alpha, beta = beta,
+                      kappa = kappa, rho = rho)
+  answer <- 1 - 2 * (1 + 0.1)^{-1} + (1 + 0.1)^{-B1 - B3}*(1 + 0.2)^{-B2}
+  expect_equal(val, answer)
+})
+
+test_that("Pairwise 1-0 Exp",{
+  t1 <- 0.0
+  t2 <- 1.0
+  x1 <- 1.0
+  alpha <- -1.0
+  beta <- 10
+  rho <- 1.0
+  kappa <- 1.0
+  B1 <- ComputeB1Exp(rho, t1, t2)
+  B2 <- ComputeBInterExp(rho, t1, t2)
+  B3 <- ComputeB3Exp(rho, t1, t2)
+
+  # alpha > 0
+  val <-PairwiseOneZeroExp(t1 = t1, t2 = t2,
+                     x1 = x1,
+                     alpha = alpha, beta = beta,
+                     kappa = kappa, rho = rho)
+  answer <- -1/10 * (1+2/10)^{0} + 1/10*(1+2/10)^{B1-1}*(1+3/10)^{B2-1}*(1+0.1)^{B3}*((B1+B2)*(1+0.2)+B1/10)
+  expect_equal(val, answer)
+
+  # alpha > 0
+  alpha <- 1.0
+  val <- PairwiseOneZeroExp(t1 = t1, t2 = t2,
+                     x1 = x1,
+                     alpha = alpha, beta = beta,
+                     kappa = kappa, rho = rho)
+  answer <- 1/10 * (1+2/10)^{-B1-B2-1} - 1/10*(1+2/10)^{-B1-1}*(1+3/10)^{-B2-1}*(1+0.1)^{-B3}*((B1+B2)*(1+0.2)+B1/10)
+  expect_equal(val, answer)
+})
+
+
+
+
+

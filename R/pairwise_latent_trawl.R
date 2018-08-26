@@ -82,23 +82,6 @@ ComputeBInterExp <- function(rho, t1, t2){
   }
 }
 
-# Example:
-rho <- 0.3
-t1 <- 0.1
-t2 <- 0.3
-ComputeAExp(rho)
-ComputeB1Exp(rho, t1, t2) + ComputeBInterExp(rho, t1, t2)
-ComputeB3Exp(rho, t1, t2) + ComputeBInterExp(rho, t1, t2)
-
-is_vector_elem <- function(vec_to_check, var_name){
-  return(var_name %in% vec_to_check)
-}
-
-# Example
-test_vec <- c("elem")
-is_vector_elem(test_vec, "elem") # Returns True
-is_vector_elem(test_vec, "ele") # Returns False
-
 #' Computes inverse of g from the marginal transform method (vectorised version).
 #' That is from GPD(offset_shape, offset_scale) to GPD(alpha, beta+kappa).
 #'
@@ -152,7 +135,7 @@ TrfG <- function(x, alpha, beta, kappa, offset_scale, offset_shape){
   if(kappa <= 0) stop('kappa should be positive.')
   if(offset_scale <= 0) stop('offset_scale should be positive.')
 
-  res <- sign(alpha)*(beta+kappa)*((1+x/(offset_scale))^{offset_shape/alpha}-1)
+  res <- sign(alpha)*(beta+kappa)*((1+sign(offset_shape)*x/(offset_scale))^{offset_shape/alpha}-1)
   return(res)
 }
 
@@ -175,74 +158,6 @@ TrfFindOffsetScale <- function(alpha, beta, kappa, offset_shape){
 
   return(1+kappa)
 }
-
-# Example
-kappa <- 1.2
-alpha <- 3
-beta <- 3
-rho <- 0.4
-n_moments <- 4
-
-offset_shape <- n_moments + 1
-offset_scale <- TrfFindOffsetScale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
-
-## Verification of output densities
-n_samples <- 2^16
-gpd_data_offset <- gPdtest::rgp(n = n_samples, shape = 1/offset_shape, scale = (offset_scale)/offset_shape)
-gpd_data_ab <- gPdtest::rgp(n_samples, shape = 1/alpha, scale=(beta+kappa)/alpha)
-
-## Verification TrfInverseG and TrfG are inverse functions of eachother
-plot(1:5, 1:5-TrfInverseG(TrfG(x = 1:5, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape),
-                     alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), ylab = "id")
-plot(1:5, 1:5-TrfG(TrfInverseG(z = 1:5, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape),
-                 alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), ylab = "id")
-
-#### testing the marginal fits
-gPdtest::gpd.fit(gpd_data_ab, method = "amle") # should be 1/3 (1.2+3)/3
-gPdtest::gpd.fit(TrfG(x = gpd_data_offset, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), method ="amle")
-
-
-# Example 2: negative alpha
-kappa <- 1.2
-alpha <- -3
-beta <- 0.5
-rho <- 0.4
-n_moments <- 1
-
-offset_shape <- n_moments + 1
-offset_scale <- TrfFindOffsetScale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
-
-## Verification TrfInverseG and TrfG are inverse functions of eachother
-plot(1:5, 1:5-TrfInverseG(TrfG(x = 1:5, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape),
-                        alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), ylab = "id")
-plot(1:5, 1:5/5-TrfG(TrfInverseG(z = 1:5/5, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape),
-                    alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), ylab = "id")
-
-
-## Verification of output densities
-n_samples <- 2^16
-gpd_data_offset <- gPdtest::rgp(n = n_samples, shape = 1/offset_shape, scale = (offset_scale)/offset_shape)
-gpd_data_ab <- gPdtest::rgp(n_samples, shape = 1/alpha, scale=-(beta+kappa)/alpha)
-
-### from GPD(offset, offset+kappa) to GPD(alpha, beta)
-hist(TrfG(x = gpd_data_offset, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), freq = F, breaks=80)
-
-plot(density(TrfG(x = gpd_data_offset, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)))
-lines(density(gpd_data_ab), type="l", col="red")
-lines(seq(0,15,length.out = 100), -alpha/(beta+kappa)*(1-seq(0,15,length.out = 100)/(beta+kappa))^{-alpha-1}, lty = 2, col="green")
-
-#### testing the marginal fits
-gPdtest::gpd.fit(gpd_data_ab, method = "combined") # -1/3 (0.5+1.2)/3
-gPdtest::gpd.fit(TrfG(x = gpd_data_offset, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), method ="combined")
-
-### from GPD(alpha, beta) to GPD(offset, offset+kappa)
-hist(gpd_data_offset[gpd_data_offset < 10], col="red", xlim=c(0,10), breaks=10, probability = T)
-lines(density(TrfInverseG(z = gpd_data_ab[gpd_data_ab < 1], alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)))
-lines(seq(0,5,length.out = 100), offset_shape/(offset_scale)*(1+seq(0,5,length.out = 100)/(offset_scale))^{-offset_shape-1}, lty = 2, col="green", lwd=2)
-
-#### testing the marginal fits
-gPdtest::gpd.fit(gpd_data_offset, method = "amle") # 1/2
-gPdtest::gpd.fit(TrfInverseG(z = gpd_data_ab, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape), method ="amle")
 
 #' Computes the probability density function of Generalised Pareto Distribution at x,
 #' with shape parameter alpha and scale parameter beta.
@@ -306,8 +221,6 @@ proba_trf_k <- 1/(1+kappa)
 proba_trf_a_b <- (1+1/beta)^{-alpha}
 
 proba_no_trf <- (1+kappa/beta)^{-alpha}
-cat("Proba trf:", proba_trf_k)
-cat("Proba no trf:", proba_no_trf)
 library(fExtremes)
 library(evir)
 
@@ -560,31 +473,6 @@ PairwiseOneZeroExp <- function(t1, x1, t2, alpha, beta, kappa, rho, transformati
 }
 
 # Example
-t1 <- 0.0
-t2 <- 1.0
-x1 <- 1.0
-alpha <- -1.0
-beta <- 10
-rho <- 1.0
-kappa <- 1.0
-B1 <- ComputeB1Exp(rho, t1, t2)
-B2 <- ComputeBInterExp(rho, t1, t2)
-B3 <- ComputeB3Exp(rho, t1, t2)
-
-PairwiseOneZeroExp(t1 = t1, t2 = t2,
-                x1 = x1,
-                alpha = alpha, beta = beta,
-                kappa = kappa, rho = rho)
-answer <- -1/10 * (1+2/10)^{0} + 1/10*(1+2/10)^{B1-1}*(1+3/10)^{B2-1}*(1+0.1)^{B3}*((B1+B2)*(1+0.2)+B1/10)
-answer
-
-alpha <- 1.0
-PairwiseOneZeroExp(t1 = t1, t2 = t2,
-                x1 = x1,
-                alpha = alpha, beta = beta,
-                kappa = kappa, rho = rho)
-answer <- 1/10 * (1+2/10)^{-B1-B2-1} - 1/10*(1+2/10)^{-B1-1}*(1+3/10)^{-B2-1}*(1+0.1)^{-B3}*((B1+B2)*(1+0.2)+B1/10)
-answer
 
 # Case 1-1
 

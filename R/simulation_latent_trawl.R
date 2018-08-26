@@ -35,13 +35,13 @@ GammaSqBox <- function(alpha, beta, dt, n){
 #' @param t trawl function peak time.
 #' @param rho exponential trawl parameter. Should be positive.
 #' @param max_value Miximal value of the trawl function (if known). Default 1.
-#' @param min_value Minimal value accepted for the trawl function. Default is 1e-2.
+#' @param min_value Minimal value accepted for the trawl function. Default is
+#'   1e-2.
 #'
-#' @returns (Vectorised) Exponential trawl function with peak time t and parameter rho. If this function
-#' is evaluated using NA, it yields a list of key components (rho, max time difference, total
-#' area of trawl set A).
-#' @example f <- TrawlExp(t=1, rho=1)
-#' f(0) # returns e^{-1}
+#' @returns (Vectorised) Exponential trawl function with peak time t and
+#'   parameter rho. If this function is evaluated using NA, it yields a list of
+#'   key components (rho, max time difference, total area of trawl set A).
+#' @example f <- TrawlExp(t=1, rho=1) f(0) # returns e^{-1}
 TrawlExp <- function(t, rho, max_value=1, min_value=1e-2){
   if(rho <= 0) stop('rho should be positive.')
   time_eta <- -log(min_value)/rho
@@ -61,18 +61,17 @@ TrawlExp <- function(t, rho, max_value=1, min_value=1e-2){
   })
 }
 
-#' Returns a primitive of exponential trawl function with base time t. Such primitive
-#' has its zero at \code{zero_at}.
+#' Returns a primitive of exponential trawl function with base time t. Such
+#' primitive has its zero at \code{zero_at}.
 #'
 #' @param t trawl function peak time.
 #' @param rho exponential trawl parameter. Should be positive.
 #' @param zero_at Value at which primitive is zero. Default is \code{-Inf}.
 #'
-#' @returns (Vectorised) Primitive of Exponential trawl function with peak time t
-#' and parameter rho. If this function is evaluated using NA, it yields a list of key components
-#' such as the trawl peak time t.
-#' @example F <- TrawlExpPrimitive(t=1, rho=2)
-#' F(0) # returns e^{-2}/2
+#' @returns (Vectorised) Primitive of Exponential trawl function with peak time
+#'   t and parameter rho. If this function is evaluated using NA, it yields a
+#'   list of key components such as the trawl peak time t.
+#' @example F <- TrawlExpPrimitive(t=1, rho=2) F(0) # returns e^{-2}/2
 TrawlExpPrimitive <- function(t, rho, zero_at=-Inf){
   # primitive of exponential trawl function which is zero at zero_at
   return(function(s){
@@ -87,18 +86,19 @@ TrawlExpPrimitive <- function(t, rho, zero_at=-Inf){
   })
 }
 
-#' Creates a list of trawl functions  given a type of trawl and a vector of times as peak times.
-#' Has the option to get primitives. Note that only exponential trawl are implemented
-#' so far.
+#' Creates a list of trawl functions  given a type of trawl and a vector of
+#' times as peak times. Has the option to get primitives. Note that only
+#' exponential trawl are implemented so far.
 #'
-#' @param times Vector of times to evaluate the trawl function (or primitive) at.
+#' @param times Vector of times to evaluate the trawl function (or primitive)
+#'   at.
 #' @param params List of trawl parameters.
 #' @param type Trawl type (so far, only "exp" is available).
 #' @param prim Boolean to use primitive or not. Default is False (F).
 #'
 #' @returns Collection of trawl functions set on \code{times} given the type of
-#' trawl (\code{type}).
-#' @example CollectionTrawl(times = 1:5, list("rho"=0.4), type="exp") # returns
+#'   trawl (\code{type}).
+#' @example CollectionTrawl(times = 1:5, list("rho"=0.4), type="exp")
 CollectionTrawl <- function(times, params, type, prim=F){
   if(!is.list(params)) stop('params should be a list.')
   # TODO Add more than exp
@@ -150,15 +150,19 @@ CollectionTrawl <- function(times, params, type, prim=F){
 # }
 
 
-#' Computes the area of a slice for the Slice Partition method of trawl functions.
+#' Computes the area of a slice for the Slice Partition method of trawl
+#' functions.
 #'
 #' @param i main index.
 #' @param j secondary index.
-#' @param times vector of discret times at which the trawl function is partionned.
+#' @param times vector of discret times at which the trawl function is
+#'   partionned.
 #' @param trawl_f_prim Trawl function primitive.
 #'
-#' @returns Area of slice \code{S(i,j){} in Slice Partition method for trawl functions.
-#' @example SliceArea(1, 2, times=c(0, 1, 2, 3), TrawlExpPrimitive(t=2, rho=0.2))
+#' @returns Area of slice \code{S(i,j){} in Slice Partition method for trawl
+#'   functions.
+#' @example SliceArea(1, 2, times=c(0, 1, 2, 3), TrawlExpPrimitive(t=2,
+#'   rho=0.2))
 SliceArea <- function(i, j, times, trawl_f_prim){
   prim_info <- trawl_f_prim(NA)
   origin_time <- prim_info$trawl_time
@@ -281,23 +285,24 @@ SliceArea <- function(i, j, times, trawl_f_prim){
 #   return(results)
 # }
 
-#' Performs trawl slices reconstuction to get gamma samples
-#' using the independent measure scaterring.
+#' Performs trawl slices reconstuction to get gamma samples using the
+#' independent measure scaterring.
 #'
 #' @param alpha (Gamma) Shape parameter.
 #' @param beta (Gamma) Scale parameter.
 #' @param times Vectors of discret times.
 #' @param n Number of simulations (so far, only \code{n=1} is implemented).
 #' @param trawl_fs collection of trawl functions indexed on \code{times}.
-#' @param trawl_fs_prim collection of trawl functions primitives indexed on \code{times}.
+#' @param trawl_fs_prim collection of trawl functions primitives indexed on
+#'   \code{times}.
 #' @param deep_cols Depth of reconstruction (columns). Default is 30.
 #'
 #' @return Gamma samples using trawl slice reconstruction.
-#' @example
-#' fcts <- lapply(c(1,2,3,4), function(t) TrawlExp(t, rho=0.2))
+#' @example fcts <- lapply(c(1,2,3,4), function(t) TrawlExp(t, rho=0.2))
 #' prims <- lapply(c(1,2,3,4), function(t) TrawlExpPrimitive(t, rho=0.2))
 #' TrawlSliceReconstruct(alpha=3, beta=2, times=c(0, 1, 2, 3), n=1, fcts, prims)
 TrawlSliceReconstruct <- function(alpha, beta, times, n, trawl_fs, trawl_fs_prim, deep_cols=30){
+  # TODO Function for other marginals
   # TODO REMOVE trawl_fs dependency
   # TODO check size times vs trawl_fs_prim
   # TODO sort the trawl_fs and trawl_fs_prim as the times
@@ -308,8 +313,6 @@ TrawlSliceReconstruct <- function(alpha, beta, times, n, trawl_fs, trawl_fs_prim
   #deep_cols <- 30 # TODO render this customisable
   n_times <- length(times)
 
-
-  #times <- sort(times)
   A <- trawl_fs[[1]](NA)$A # TODO A special for each timestep
   slice_mat <- matrix(0, nrow = n_times, ncol = deep_cols)
   gamma_sim <- matrix(0, nrow = n_times, ncol = deep_cols)
@@ -386,10 +389,12 @@ TrawlSliceReconstruct <- function(alpha, beta, times, n, trawl_fs, trawl_fs_prim
 #' @param beta Scale parameter.
 #' @param times Vectors of discret times.
 #' @param trawl_fs collection of trawl functions indexed on \code{times}.
-#' @param trawl_fs_prim collection of trawl functions primitives indexed on \code{times}.
+#' @param trawl_fs_prim collection of trawl functions primitives indexed on
+#'   \code{times}.
 #' @param n Number of simulations (so far, only \code{n=1} is implemented).
 #' @param kappa Additive constant to scale parameter \code{beta}.
-#' @param transformation Boolean to apply marginal transform method. Default is False (F).
+#' @param transformation Boolean to apply marginal transform method. Default is
+#'   False (F).
 #' @param offset_shape Transformed-marginal Shape parameter.
 #' @param offset_scale Transformed-marginal Scale parameter.
 #'
@@ -427,21 +432,24 @@ rltrawl <- function(alpha, beta, times, trawl_fs, trawl_fs_prim, n, kappa = 0,
   return(results)
 }
 
-#' Simulation of extreme value path using trawl process. Transformed marginals have
-#' scale parameter \code{1+kappa}.
+#' Simulation of extreme value path using trawl process. Transformed marginals
+#' have scale parameter \code{1+kappa}.
 #'
 #' @param alpha Shape parameter.
 #' @param beta Scale parameter.
 #' @param kappa Additive constant to scale parameter \code{beta}.
 #' @param times Vectors of discret times.
 #' @param trawl_fs collection of trawl functions indexed on \code{times}.
-#' @param trawl_fs_prim collection of trawl functions primitives indexed on \code{times}.
+#' @param trawl_fs_prim collection of trawl functions primitives indexed on
+#'   \code{times}.
 #' @param n Number of simulations (so far, only \code{n=1} is implemented).
-#' @param transformation Boolean to apply marginal transform method. Default is False (F).
+#' @param transformation Boolean to apply marginal transform method. Default is
+#'   False (F).
 #' @param n_moments Number of finite moments for transformed marginals.
 #' @param deep_cols Depth of reconstruction (columns). Default is 30.
 #'
-#' @returns Simulated path (size the same as times) of latent-trawl extreme value process.
+#' @returns Simulated path (size the same as times) of latent-trawl extreme
+#'   value process.
 #' @example TODO
 rlexceed <- function(alpha, beta, kappa, times, trawl_fs, trawl_fs_prim, n, transformation, n_moments = 4, deep_cols=30){
   # TODO n is not implemented yet
