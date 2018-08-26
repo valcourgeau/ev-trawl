@@ -1,3 +1,5 @@
+std_model_params_names <- c("alpha", "beta", "rho", "kappa")
+
 #' Wrapper to compute total area under exponential trawl function.
 #'
 #' @param rho Exponential trawl parameter (should be non-negative).
@@ -749,17 +751,20 @@ FullPL <- function(times, values, alpha, beta, kappa, rho, delta, logscale=T, tr
 #' Wrapper for FullPL using a list for parameters in the exponential trawl case.
 #' @param times Vector of timestamps.
 #' @param values Vector of target values.
-#' @param delta Maximum depth of pairwise likelihood blocks. Should be positive natural integer.
+#' @param delta Maximum depth of pairwise likelihood blocks. Should be positive
+#'   natural integer.
 #' @param params List of parameters.
 #' @param logscale Boolean to use logscale (log-likelihood). Default \code{T}.
 #' @param transformation Boolean to use the Marginal Transform (MT) method.
 #'
 #' @return Pairwise Likelihood as per FullPL using a list of parameters instead.
 #' @example ParamsListFullPL(c(1,2,3,4,5), c(0,2.3,.3,0,5), delta=2,
-#' params=list("alpha"=2,"beta"=3,"kappa"=1.5), T, F)
+#'   params=list("alpha"=2,"beta"=3,"kappa"=1.5), T, F)
 ParamsListFullPL <- function(times, values, delta, params, logscale=T, transformation=F){
   # TODO add general model parameter names
-  #print(params)
+
+  if(prod(std_model_params_names %in% names(params)) != 1) stop('Essential parameters missing.')
+
   return(FullPL(times, values,
                  alpha = (params["alpha"][[1]]),
                  beta = (params["beta"][[1]]),
@@ -770,12 +775,13 @@ ParamsListFullPL <- function(times, values, delta, params, logscale=T, transform
                  transformation = transformation))
 }
 
-#' Computes univariate latent trawl FULL pairwise likelihood depending with exponential trawl function
-#' with the option to fix some parameter values.
+#' Computes univariate latent trawl FULL pairwise likelihood depending with
+#' exponential trawl function with the option to fix some parameter values.
 #'
 #' @param times Vector of timestamps.
 #' @param values Vector of target values.
-#' @param delta Maximum depth of pairwise likelihood blocks. Should be positive natural integer.
+#' @param delta Maximum depth of pairwise likelihood blocks. Should be positive
+#'   natural integer.
 #' @param fixed_names Vector of literal names of parameters to keep fixed.
 #' @param fixed_params Vector of numerical values of fixed parameters.
 #' @param params List of parameters.
@@ -783,15 +789,12 @@ ParamsListFullPL <- function(times, values, delta, params, logscale=T, transform
 #' @param logscale Boolean to use logscale (log-likelihood). Default \code{T}.
 #' @param transformation Boolean to use the Marginal Transform (MT) method.
 #'
-#' @return FULL latent trawl pairwise likelihood with some (or none) parameters fixed.
-#' @example
-#' times <- c(1,2,3,4,5)
-#' values <- c(2,0,3,4,0)
-#' delta <- 2
-#' fixed_names <- c("alpha", "beta")
-#' params <- c(2.0, 3.4, 0.1, 4.3)
-#' model_vars_names <- c("alpha", "beta", "rho", "kappa")
-#' UnivariateFullPL(times, values, delta, fixed_names, params, model_vars_names, T, F)
+#' @return FULL latent trawl pairwise likelihood with some (or none) parameters
+#'   fixed.
+#' @example times <- c(1,2,3,4,5) values <- c(2,0,3,4,0) delta <- 2 fixed_names
+#' <- c("alpha", "beta") params <- c(2.0, 3.4, 0.1, 4.3) model_vars_names <-
+#' c("alpha", "beta", "rho", "kappa") UnivariateFullPL(times, values, delta,
+#' fixed_names, params, model_vars_names, T, F)
 UnivariateFullPL <- function(times, values, delta, fixed_names, fixed_params, params, model_vars_names, logscale=T, transformation=F){
   if(length(fixed_names) > length(model_vars_names)) stop('Too many fixed parameters compared to number of model params.')
   if(length(fixed_params) + length(params) != length(model_vars_names)) stop('Wrong number of params compared to model specs.')
@@ -823,7 +826,8 @@ UnivariateFullPL <- function(times, values, delta, fixed_names, fixed_params, pa
                           transformation = transformation))
 }
 
-#' Computes Generalised Pareto (log-)likelihood on non-zero exceedances under independence.
+#' Computes Generalised Pareto (log-)likelihood on non-zero exceedances under
+#' independence.
 #'
 #' @param values Vector of target values.
 #' @param fixed_names Vector of literal names of parameters to keep fixed.
@@ -833,17 +837,14 @@ UnivariateFullPL <- function(times, values, delta, fixed_names, fixed_params, pa
 #' @param logscale Boolean to use logscale (log-likelihood). Default \code{T}.
 #' @param transformation Boolean to use the Marginal Transform (MT) method.
 #' @param n_moments Number of moments the transformed variables should have
-#' using the Marginal Transform (MT) method.
+#'   using the Marginal Transform (MT) method.
 #'
-#' @return Generalised Pareto (log-)likelihood on non-zero exceedances under independence.
-#' @example
-#' times <- c(1,2,3,4,5)
-#' values <- c(2,0,3,4,0)
-#' delta <- 2
-#' fixed_names <- c("alpha", "kappa")
-#' params <- c(2.0, 3.4, 0.1, 4.3)
-#' model_vars_names <- c("alpha", "beta", "rho", "kappa")
-#' UnivariateFullPL(times, values, delta, fixed_names, params, model_vars_names, T, F)
+#' @return Generalised Pareto (log-)likelihood on non-zero exceedances under
+#'   independence.
+#' @example times <- c(1,2,3,4,5) values <- c(2,0,3,4,0) delta <- 2 fixed_names
+#' <- c("alpha", "kappa") params <- c(2.0, 3.4, 0.1, 4.3) model_vars_names <-
+#' c("alpha", "beta", "rho", "kappa") UnivariateFullPL(times, values, delta,
+#' fixed_names, params, model_vars_names, T, F)
 MarginalGPDLikelihood <- function(values, fixed_names, fixed_params, params, model_vars_names, logscale=T, transformation=F, n_moments=4){
   if(length(fixed_names) > length(model_vars_names)) stop('Too many fixed parameters compared to number of model params.')
   if(length(fixed_params) + length(params) != length(model_vars_names)) stop('Wrong number of params compared to model specs.')
