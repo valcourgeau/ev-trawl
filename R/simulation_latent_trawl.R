@@ -1,6 +1,9 @@
 setwd("~/GitHub/ev.trawl/R/")
 source('pairwise_latent_trawl.R')
 
+library("ghyp")
+
+
 #' Sample Gamma with small shape parameter \code{alpha*dx*dy}.
 #'
 #' @param alpha Shape parameter.
@@ -259,27 +262,33 @@ SliceArea <- function(i, j, times, trawl_f_prim){
 #' @param alpha (Gamma) Shape parameter.
 #' @param beta (Gamma) Scale parameter.
 #' @param times Vectors of discret times.
-#' @param marginal Function to generate marginals.
+#' @param marg.dist Name of infinitely divisible distribution. Currenlt
+#'   implemented: gamma, gaussian, generalised hyperbolic, generalised inverse
+#'   gaussian.
 #' @param n Number of simulations (so far, only \code{n=1} is implemented).
 #' @param trawl_fs collection of trawl functions indexed on \code{times}.
 #' @param trawl_fs_prim collection of trawl functions primitives indexed on
 #'   \code{times}.
 #' @param deep_cols Depth of reconstruction (columns). Default is 30.
 #'
-#' @return Samples using trawl slice reconstruction disributed using \code{marginal}.
-#' @example fcts <- lapply(c(1,2,3,4), function(t) TrawlExp(t, rho=0.2))
-#' prims <- lapply(c(1,2,3,4), function(t) TrawlExpPrimitive(t, rho=0.2))
-#' TrawlSliceReconstruct(alpha=3, beta=2, times=c(0, 1, 2, 3), n=1, fcts, prims)
-TrawlSliceReconstruct <- function(alpha, beta, times, marginal, n, trawl_fs, trawl_fs_prim, deep_cols=30){
+#' @return Samples using trawl slice reconstruction disributed using
+#'   \code{marginal}.
+#' @example fcts <- lapply(c(1,2,3,4), function(t) TrawlExp(t, rho=0.2)) prims
+#'   <- lapply(c(1,2,3,4), function(t) TrawlExpPrimitive(t, rho=0.2))
+#'   TrawlSliceReconstruct(alpha=3, beta=2, times=c(0, 1, 2, 3), marg.dist =
+#'   "gamma", n=1, fcts, prims)
+TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, trawl_fs_prim, deep_cols=30){
   # TODO Function for other marginals
   # TODO REMOVE trawl_fs dependency
   # TODO check size times vs trawl_fs_prim
   # TODO sort the trawl_fs and trawl_fs_prim as the times
   # TODO current_trawl and going further back? instead of 8
   if(n > 1) stop("Case n>1 not yet implemented.")
-  if(!is.list(trawl_fs_prim)) stop('Wrong type: trawl set should be a list.')
+  if(!is.list(trawl_fs_prim)) stop('Wrong type: trawl function primitives should be a list.')
+  if(!marg.dist %in% c("gamma", "normal", "gaussian", "gig", "gh")){
+    stop(paste('marg.distr', marg.dist, 'not yet implemented.'))
+  }
 
-  #deep_cols <- 30 # TODO render this customisable
   n_times <- length(times)
 
   A <- trawl_fs[[1]](NA)$A # TODO A special for each timestep
@@ -290,15 +299,26 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marginal, n, trawl_fs, tra
   for(main_index in 1:n_times){
     for(second_index in 1:deep_cols){
       slice_mat[main_index, second_index] <- SliceArea(main_index, min(second_index + main_index - 1, n_times), times, trawl_fs_prim[[main_index]]) # TODO fix for last row
-      gamma_sim[main_index, second_index] <- marginal(shape = alpha * slice_mat[main_index, second_index] / A,
-                                                    rate = beta,
-                                                    n = 1)
+
+      # it suffices to implement new marginals here
+      gamma_sim[main_index, second_index] <-
+        switch(marg.dist,
+             "gamma" = rgamma(n = 1, alpha * slice_mat[main_index, second_index] / A,
+                                beta),
+             "gaussian" = rnorm(n = 1, mean = alpha * slice_mat[main_index, second_index] / A,
+                                  sd =  beta * sqrt(slice_mat[main_index, second_index] / A)),
+             "normal" = rnorm(n = 1, mean = alpha * slice_mat[main_index, second_index] / A,
+                              sd = beta * sqrt(slice_mat[main_index, second_index] / A)),
+             "gig" = ghyp::rgig(n = 1, lambda = 0, chi = alpha*slice_mat[main_index, second_index] / A,
+                                psi = beta*slice_mat[main_index, second_index] / A)
+             )
+
     }
   }
 
   # Using independent scattering of Levy basis to add time dependence to trawls
   results <- matrix(0, nrow = length(times), ncol = 1)
-  upper.anti.tri<-function(m) col(m)+row(m) < dim(m)[1]+1
+  upper.anti.tri<-function(m){col(m)+row(m) < dim(m)[1]+1}
   anti_diag_mat <- matrix(1, deep_cols, deep_cols)
   anti_diag_mat[upper.anti.tri(anti_diag_mat)] <- 0
   results <- vapply(1:(n_times - 1*deep_cols),
