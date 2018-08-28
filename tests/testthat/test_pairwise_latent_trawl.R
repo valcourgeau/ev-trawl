@@ -1,7 +1,7 @@
-context("Slice Area")
 #source("./R/pairwise_latent_trawl.R")
 library("evir")
 
+context("Slice Area")
 test_that("rho must be non-negative in exp trawl",
           {
             rho <- -1

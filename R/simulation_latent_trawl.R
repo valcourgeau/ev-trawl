@@ -41,7 +41,7 @@ GammaSqBox <- function(alpha, beta, dt, n){
 #' @returns (Vectorised) Exponential trawl function with peak time t and
 #'   parameter rho. If this function is evaluated using NA, it yields a list of
 #'   key components (rho, max time difference, total area of trawl set A).
-#' @example f <- TrawlExp(t=1, rho=1) f(0) # returns e^{-1}
+#' @example TrawlExp(t=1, rho=1) f(0) # returns e^{-1}
 TrawlExp <- function(t, rho, max_value=1, min_value=1e-2){
   if(rho <= 0) stop('rho should be positive.')
   time_eta <- -log(min_value)/rho
@@ -71,9 +71,10 @@ TrawlExp <- function(t, rho, max_value=1, min_value=1e-2){
 #' @returns (Vectorised) Primitive of Exponential trawl function with peak time
 #'   t and parameter rho. If this function is evaluated using NA, it yields a
 #'   list of key components such as the trawl peak time t.
-#' @example F <- TrawlExpPrimitive(t=1, rho=2) F(0) # returns e^{-2}/2
+#' @example TrawlExpPrimitive(t=1, rho=2) F(0) # returns e^{-2}/2
 TrawlExpPrimitive <- function(t, rho, zero_at=-Inf){
   # primitive of exponential trawl function which is zero at zero_at
+  if(rho <= 0) stop('rho should be positive.')
   return(function(s){
     if(is.na(s[1])){
       return(list(trawl_time=t))
@@ -116,39 +117,6 @@ CollectionTrawl <- function(times, params, type, prim=F){
   }
   stop('Fatal error: no trawl functions list created')
 }
-
-
-
-# trawl_deterministic <- function(trawl_f, alpha, beta, dt, n = n){
-#   trawl_info <- trawl_f(NA)
-#
-#   time_grid <- 0:(trawl_info$time_eta/dt + 1) * dt + trawl_info$trawl_time - trawl_info$time_eta
-#   space_grid <- 0:(trawl_info$max_value/dt + 1) * dt
-#   values <- trawl_f(time_grid)
-#   space_ind <- rep(0, length(values))
-#
-#   for(index in 1:length(values)){
-#     space_ind[index] <- which(space_grid >= values[index])[1]
-#   }
-#
-#   result <- rep(0, n)
-#   for(index in 1:n){
-#     accum <- 0
-#     for(nb_boxes in space_ind){
-#       if(accum > 2^20){
-#         result[index] <- result[index] + sum(GammaSqBox(alpha = alpha / trawl_info$A, beta = beta, dt = dt, n = accum))
-#         accum <- 0
-#       }
-#       accum <- accum + nb_boxes
-#     }
-#     if(accum > 0){
-#       result[index] <- result[index] + sum(GammaSqBox(alpha = alpha, beta = beta, dt = dt, n = accum))
-#     }
-#     result[index] <- result[index]
-#   }
-#   return(result)
-# }
-
 
 #' Computes the area of a slice for the Slice Partition method of trawl
 #' functions.
@@ -291,17 +259,18 @@ SliceArea <- function(i, j, times, trawl_f_prim){
 #' @param alpha (Gamma) Shape parameter.
 #' @param beta (Gamma) Scale parameter.
 #' @param times Vectors of discret times.
+#' @param marginal Function to generate marginals.
 #' @param n Number of simulations (so far, only \code{n=1} is implemented).
 #' @param trawl_fs collection of trawl functions indexed on \code{times}.
 #' @param trawl_fs_prim collection of trawl functions primitives indexed on
 #'   \code{times}.
 #' @param deep_cols Depth of reconstruction (columns). Default is 30.
 #'
-#' @return Gamma samples using trawl slice reconstruction.
+#' @return Samples using trawl slice reconstruction disributed using \code{marginal}.
 #' @example fcts <- lapply(c(1,2,3,4), function(t) TrawlExp(t, rho=0.2))
 #' prims <- lapply(c(1,2,3,4), function(t) TrawlExpPrimitive(t, rho=0.2))
 #' TrawlSliceReconstruct(alpha=3, beta=2, times=c(0, 1, 2, 3), n=1, fcts, prims)
-TrawlSliceReconstruct <- function(alpha, beta, times, n, trawl_fs, trawl_fs_prim, deep_cols=30){
+TrawlSliceReconstruct <- function(alpha, beta, times, marginal, n, trawl_fs, trawl_fs_prim, deep_cols=30){
   # TODO Function for other marginals
   # TODO REMOVE trawl_fs dependency
   # TODO check size times vs trawl_fs_prim
@@ -321,17 +290,11 @@ TrawlSliceReconstruct <- function(alpha, beta, times, n, trawl_fs, trawl_fs_prim
   for(main_index in 1:n_times){
     for(second_index in 1:deep_cols){
       slice_mat[main_index, second_index] <- SliceArea(main_index, min(second_index + main_index - 1, n_times), times, trawl_fs_prim[[main_index]]) # TODO fix for last row
-      #if(slice_mat[main_index, second_index] > 1e-3){
-      #print(alpha * slice_mat[main_index, second_index] / A)
-      gamma_sim[main_index, second_index] <- rgamma(shape = alpha * slice_mat[main_index, second_index] / A,
+      gamma_sim[main_index, second_index] <- marginal(shape = alpha * slice_mat[main_index, second_index] / A,
                                                     rate = beta,
                                                     n = 1)
-      #}
     }
   }
-
-  # Going back in time to use the dep structure
-  # n_trawl_forward <- trawl_fs[[1]](NA)$time_eta
 
   # Using independent scattering of Levy basis to add time dependence to trawls
   results <- matrix(0, nrow = length(times), ncol = 1)
@@ -343,13 +306,6 @@ TrawlSliceReconstruct <- function(alpha, beta, times, n, trawl_fs, trawl_fs_prim
                       return(sum(gamma_sim[i:(i - 1 + deep_cols),] * anti_diag_mat))
                     },
                     1.0)
-
-  # Adding the part that is unique to each column: the top
-  # for(main_index in 1:(length(times))){
-  #   results[main_index,] <- results[main_index,] + gamma_sim[(main_index-1) * deep_cols + 1,]
-  # }
-
-  #results[length(times),] <- results[length(times), ] + gamma_sim[(length(times)-1) * length(times) + length(times),]
 
   return(results)
 }
@@ -388,9 +344,14 @@ TrawlSliceReconstruct <- function(alpha, beta, times, n, trawl_fs, trawl_fs_prim
 #' @param alpha Shape parameter.
 #' @param beta Scale parameter.
 #' @param times Vectors of discret times.
+#' @param marginal Function to generate marginals.
+#' @param trawl.function Type of trawl function that should be used. Default NA.
 #' @param trawl_fs collection of trawl functions indexed on \code{times}.
+#'   Default NA. Default NA if no \code{trawl.function} is indicated and should
+#'   contain as many as in \code{times}.
 #' @param trawl_fs_prim collection of trawl functions primitives indexed on
-#'   \code{times}.
+#'   \code{times}. Default NA if no \code{trawl.function} is indicated and
+#'   should contain as many as in \code{times}.
 #' @param n Number of simulations (so far, only \code{n=1} is implemented).
 #' @param kappa Additive constant to scale parameter \code{beta}.
 #' @param transformation Boolean to apply marginal transform method. Default is
@@ -399,20 +360,41 @@ TrawlSliceReconstruct <- function(alpha, beta, times, n, trawl_fs, trawl_fs_prim
 #' @param offset_scale Transformed-marginal Scale parameter.
 #'
 #' @returns Simulated path (size the same as times) of trawl process.
-#' @example TODO
-rltrawl <- function(alpha, beta, times, trawl_fs, trawl_fs_prim, n, kappa = 0,
+#' @example
+#' alpha <- 5
+#' beta <- 3
+#' times <- 1:15
+#' trawl.function <- "exp"
+#' margi <- rgamma
+#' kappa <- 0
+#' rtrawl(alpha = alpha, beta = beta, kappa = kappa, marginals = margi,
+#'  trawl.function = trawl.function)
+rtrawl <- function(alpha, beta, times, marginal=rgamma, trawl.function=NA, trawl_fs=NA, trawl_fs_prim=NA, n, kappa = 0,
                     transformation=F, offset_shape=NULL, offset_scale=NULL, deep_cols=30){
-  if(length(trawl_fs) != length(times)){
-    stop('Wrong number of trawl functions compared to timestamps.')
+  if(!is.na(trawl.function)){
+    if(trawl.function %in% c("exp")){
+      trawl_fs <- CollectionTrawl(times = times,
+                                  params = list("rho"=rho), type = trawl.function)
+      trawl_fs_prim <- CollectionTrawl(times = times,
+                                       params = list("rho"=rho), type = trawl.function,
+                                       prim = T)
+    }else{
+      stop(paste("trawl.function", trawl.function, "not yet implemented."))
+    }
+
+  }else{
+    if(length(trawl_fs) != length(times)){
+      stop('Wrong number of trawl functions compared to timestamps.')
+    }
+    if(length(trawl_fs_prim) != length(times)){
+      stop('Wrong number of trawl primitives compared to timestamps.')
+    }
   }
-  if(length(trawl_fs_prim) != length(times)){
-    stop('Wrong number of trawl primitives compared to timestamps.')
-  }
+
   if(transformation & (is.null(offset_scale) | is.null(offset_shape))){
     stop('When using marginal trf, indicate shape and scale offsets.')
   }
 
-  ## USING _2 HERE WARNING
   if(!transformation){
     results <- TrawlSliceReconstruct(alpha = alpha,
                                       beta = beta+kappa,
