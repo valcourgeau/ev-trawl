@@ -2,7 +2,7 @@ setwd("~/GitHub/ev.trawl/R/")
 source('pairwise_latent_trawl.R')
 
 library("ghyp")
-
+library("evir")
 
 #' Sample Gamma with small shape parameter \code{alpha*dx*dy}.
 #'
@@ -262,9 +262,9 @@ SliceArea <- function(i, j, times, trawl_f_prim){
 #' @param alpha (Gamma) Shape parameter.
 #' @param beta (Gamma) Scale parameter.
 #' @param times Vectors of discret times.
-#' @param marg.dist Name of infinitely divisible distribution. Currenlt
-#'   implemented: gamma, gaussian, generalised hyperbolic, generalised inverse
-#'   gaussian.
+#' @param marg.dist Name of infinitely divisible distribution. Currenlty
+#'   implemented: gamma, gaussian, generalised hyperbolic (ghyp), generalised
+#'   inverse gaussian (gig).
 #' @param n Number of simulations (so far, only \code{n=1} is implemented).
 #' @param trawl_fs collection of trawl functions indexed on \code{times}.
 #' @param trawl_fs_prim collection of trawl functions primitives indexed on
@@ -277,16 +277,15 @@ SliceArea <- function(i, j, times, trawl_f_prim){
 #'   <- lapply(c(1,2,3,4), function(t) TrawlExpPrimitive(t, rho=0.2))
 #'   TrawlSliceReconstruct(alpha=3, beta=2, times=c(0, 1, 2, 3), marg.dist =
 #'   "gamma", n=1, fcts, prims)
-TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, trawl_fs_prim, deep_cols=30){
-  # TODO Function for other marginals
-  # TODO REMOVE trawl_fs dependency
-  # TODO check size times vs trawl_fs_prim
+TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, trawl_fs_prim, deep_cols=30, ghyp.object=NA){
+  # TODO Add GIG compatibility
   # TODO sort the trawl_fs and trawl_fs_prim as the times
-  # TODO current_trawl and going further back? instead of 8
   if(n > 1) stop("Case n>1 not yet implemented.")
   if(!is.list(trawl_fs_prim)) stop('Wrong type: trawl function primitives should be a list.')
-  if(!marg.dist %in% c("gamma", "normal", "gaussian", "gig", "gh")){
+  if(!marg.dist %in% c("gamma", "normal", "gaussian", "gig", "ghyp")){
     stop(paste('marg.distr', marg.dist, 'not yet implemented.'))
+  }else if(marg.dist == "ghyp" & class(ghyp::ghyp())[1] != "ghyp"){
+    stop('ghyp.object should be an instance of ghyp::ghyp')
   }
 
   n_times <- length(times)
@@ -309,8 +308,10 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, tr
                                   sd =  beta * sqrt(slice_mat[main_index, second_index] / A)),
              "normal" = rnorm(n = 1, mean = alpha * slice_mat[main_index, second_index] / A,
                               sd = beta * sqrt(slice_mat[main_index, second_index] / A)),
-             "gig" = ghyp::rgig(n = 1, lambda = 0, chi = alpha*slice_mat[main_index, second_index] / A,
-                                psi = beta*slice_mat[main_index, second_index] / A)
+             "gig" = ghyp::rgig(n = 1, lambda = -0.5, chi = alpha*slice_mat[main_index, second_index] / A,
+                                psi = beta*slice_mat[main_index, second_index] / A), # TODO
+             "gh" = ghyp::rghyp(n=1, object = ghyp.object)
+             # TODO find what kind of new variables we need for ID property
              )
 
     }
@@ -330,41 +331,15 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, tr
   return(results)
 }
 
-# ftrawl_slice_sets <- function(alpha, beta, times, trawl_f, trawl_f_prim, n){
-#   times <- sort(times)
-#   trawl_info <- trawl_f(NA)
-#   A <- trawl_info$A
-#   results <- matrix(0, nrow = length(times), ncol = n)
-#
-#   for(i in 1:length(times)){
-#     max_index <- suppressWarnings(min(length(times), min(which(times - times[i] > trawl_info$time_eta))))
-#     for(j in (i+1):length(times)){
-#       if(j <= length(times)){
-#         results[i,] <- results[i,] + rgamma(shape = alpha * SliceArea(i, j, times, trawl_f_prim) / A,
-#                                             rate = beta,
-#                                             n = n)
-#       }
-#     }
-#     if(i < length(times)){
-#       results[i+1,] <- results[i+1,] + results[i,]
-#       results[i,] <- results[i,] + rgamma(shape = alpha * SliceArea(i, i, times, trawl_f_prim) / A,
-#                                           rate = beta,
-#                                           n = n)
-#     }
-#   }
-#
-#   results[length(times),] <- results[length(times), ] + rgamma(shape = alpha * SliceArea(length(times), length(times), times, trawl_f_prim) / A,
-#                                                                rate = beta,
-#                                                                n = n)
-#   return(results)
-# }
-
 #' Simulation of trawl process path using Slice partition.
 #'
 #' @param alpha Shape parameter.
 #' @param beta Scale parameter.
+#' @param rho Trawl parameters. Must be positive if Exponential trawls are used.
 #' @param times Vectors of discret times.
-#' @param marginal Function to generate marginals.
+#' @param marg.dist Name of infinitely divisible distribution. Currenlty
+#'   implemented: gamma, gaussian, generalised hyperbolic, generalised inverse
+#'   gaussian.
 #' @param trawl.function Type of trawl function that should be used. Default NA.
 #' @param trawl_fs collection of trawl functions indexed on \code{times}.
 #'   Default NA. Default NA if no \code{trawl.function} is indicated and should
@@ -389,10 +364,13 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, tr
 #' kappa <- 0
 #' rtrawl(alpha = alpha, beta = beta, kappa = kappa, marginals = margi,
 #'  trawl.function = trawl.function)
-rtrawl <- function(alpha, beta, times, marginal=rgamma, trawl.function=NA, trawl_fs=NA, trawl_fs_prim=NA, n, kappa = 0,
-                    transformation=F, offset_shape=NULL, offset_scale=NULL, deep_cols=30){
+rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl_fs=NA, trawl_fs_prim=NA, n, rho=NA,
+                   kappa = 0, transformation=F, offset_shape=NULL, offset_scale=NULL, deep_cols=30){
   if(!is.na(trawl.function)){
     if(trawl.function %in% c("exp")){
+      if(is.na(rho)) stop('If trawl.function is not NA, need trawl parameters rho.')
+      if(rho <= 0) stop('rho should be positive.')
+
       trawl_fs <- CollectionTrawl(times = times,
                                   params = list("rho"=rho), type = trawl.function)
       trawl_fs_prim <- CollectionTrawl(times = times,
@@ -418,6 +396,7 @@ rtrawl <- function(alpha, beta, times, marginal=rgamma, trawl.function=NA, trawl
   if(!transformation){
     results <- TrawlSliceReconstruct(alpha = alpha,
                                       beta = beta+kappa,
+                                      marg.dist = marg.dist,
                                       times = times,
                                       trawl_fs = trawl_fs,
                                       trawl_fs_prim = trawl_fs_prim,
@@ -425,6 +404,7 @@ rtrawl <- function(alpha, beta, times, marginal=rgamma, trawl.function=NA, trawl
   }else{
     results <- TrawlSliceReconstruct(alpha = offset_shape,
                                       beta = offset_scale,
+                                      marg.dist = marg.dist,
                                       times = times,
                                       trawl_fs = trawl_fs,
                                       trawl_fs_prim = trawl_fs_prim,
@@ -434,38 +414,46 @@ rtrawl <- function(alpha, beta, times, marginal=rgamma, trawl.function=NA, trawl
   return(results)
 }
 
-#' Simulation of extreme value path using trawl process. Transformed marginals
-#' have scale parameter \code{1+kappa}.
+#' Simulation of extreme value path using latent trawl process. Transformed
+#' marginals have scale parameter \code{1+kappa}.
 #'
 #' @param alpha Shape parameter.
 #' @param beta Scale parameter.
 #' @param kappa Additive constant to scale parameter \code{beta}.
+#' @param rho Trawl parameters. Must be positive if Exponential trawls are used.
 #' @param times Vectors of discret times.
-#' @param trawl_fs collection of trawl functions indexed on \code{times}.
-#' @param trawl_fs_prim collection of trawl functions primitives indexed on
-#'   \code{times}.
+#' @param marg.dist Name of infinitely divisible distribution for latent trawls.
+#'   Currenlty implemented: gamma, gaussian, generalised hyperbolic, generalised
+#'   inverse gaussian.
 #' @param n Number of simulations (so far, only \code{n=1} is implemented).
 #' @param transformation Boolean to apply marginal transform method. Default is
 #'   False (F).
+#' @param trawl_fs collection of trawl functions indexed on \code{times}.
+#' @param trawl_fs_prim collection of trawl functions primitives indexed on
+#'   \code{times}.
 #' @param n_moments Number of finite moments for transformed marginals.
 #' @param deep_cols Depth of reconstruction (columns). Default is 30.
 #'
 #' @returns Simulated path (size the same as times) of latent-trawl extreme
 #'   value process.
 #' @example TODO
-rlexceed <- function(alpha, beta, kappa, times, trawl_fs, trawl_fs_prim, n, transformation, n_moments = 4, deep_cols=30){
+rlexceed <- function(alpha, beta, kappa, rho=NA, times, marg.dist,  n, transformation,
+                     trawl.function=NA, trawl_fs=NA, trawl_fs_prim=NA, n_moments = 4, deep_cols=30){
   # TODO n is not implemented yet
   offset_shape <- n_moments+1
-  offset_scale <- trf_find_offset_scale(alpha = alpha,
+  offset_scale <- TrfFindOffsetScale(alpha = alpha,
                                         beta = beta,
                                         kappa = kappa,
                                         offset_shape = n_moments+1)
   #print(offset_scale)
-  # Generate Gamma
-  gen_trawl <- rltrawl(alpha = alpha,
+  # Generate latent process
+  gen_trawl <- rtrawl(alpha = alpha,
                        beta = beta,
                        kappa = 0.0,
+                       rho = rho,
+                       marg.dist = marg.dist,
                        times = times,
+                       trawl.function = trawl.function,
                        trawl_fs = trawl_fs,
                        trawl_fs_prim = trawl_fs_prim,
                        n = n,
@@ -496,123 +484,6 @@ rlexceed <- function(alpha, beta, kappa, times, trawl_fs, trawl_fs_prim, n, tran
   }else{
     gen_exceedances[-which_zero] <-  rexp(n = length(gen_trawl[-which_zero]), rate = gen_trawl[-which_zero])
   }
-  #mean(gen_exceedances)
+
   return(gen_exceedances)
 }
-
-# Various tests
-# {
-#   # Example
-#   n_sims <- 50
-#   times <- 1:400
-#   kappa <- 0.3
-#   alpha <- 3
-#   beta <- 6
-#   rho <- 0.3
-#   n_moments <- 4
-#
-#   ## Find offset scale
-#   offset_shape <- n_moments + 1
-#   kappa / ((1+kappa/beta)^{alpha/offset_shape} - 1)
-#   trf_find_offset_scale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
-#   offset_scale  <- trf_find_offset_scale(alpha = alpha, beta = beta, kappa = kappa, offset_shape = offset_shape)
-#
-#   cat("Prob non zero for non-trf",(1+kappa/beta)^{-alpha}, "\n")
-#   cat("Prob non zero for trf",(1+kappa/offset_scale)^(-offset_shape), "\n")
-#
-#   ## Trawl process simulation
-#   library(gPdtest)
-#
-#   ### Generating the functions
-#   trawl_1 <- CollectionTrawl(times = times, params = list(rho=rho), type = "exp", prim = F)
-#   trawl_1_prim <- CollectionTrawl(times = times, params = list(rho=rho), type = "exp", prim = T)
-#
-#   trl_slice <- trawl_slice_sets_not_optim(alpha = alpha, beta = beta, times = times, trawl_fs = trawl_1, trawl_fs_prim = trawl_1_prim, n = 1)
-#
-#   ### no transformation
-#   gen_trawl <- rltrawl(alpha = alpha,
-#                         beta = beta,
-#                         times = times,
-#                         n = 1,
-#                         trawl_fs = trawl_1,
-#                         trawl_fs_prim = trawl_1_prim,
-#                         kappa = 0.0,
-#                         transformation = F)
-#   acf(gen_trawl, type = "covariance")
-#   (alpha)/(beta)^2
-#   hist(gen_trawl, probability = T)
-#   lines(seq(0.01, 8, length.out = 200),dgamma(seq(0.01, 8, length.out = 200), shape = alpha, scale = 1/(beta)), col = "red")
-#
-#   par(mfrow=c(1,2))
-#   #### ACF
-#   acf(gen_trawl, main = paste("ACF trawl with rho =", rho))
-#   lines(0:20, exp(-rho*0:20), col = "red")
-#
-#   #### distribution
-#   plot(density(gen_trawl), "Marginal density of trawls")
-#   lines(density(rgamma(n = 1000, shape = alpha, rate = beta)), col="red")
-#
-#   ### no transformation
-#   (1+kappa/beta)^{-alpha}
-#   1/(1+kappa)
-#   par_ests_sims_no_trf <- matrix(0, ncol = 2, nrow = n_sims)
-#   for(i in 1:n_sims){
-#     gen_exc <- rlexceed(alpha = alpha,
-#                         beta = beta,
-#                         kappa = kappa,
-#                         trawl_fs = trawl_1,
-#                         trawl_fs_prim = trawl_1_prim,
-#                         times = times,
-#                         n = 1,
-#                         transformation = F)
-#     print(mean(gen_exc))
-#     par_ests_sims_no_trf[i,] <- fExtremes::gpdFit(gen_exc, u =1e-6)@fit$par.ests
-#   }
-#   cat("mean:", (1+kappa/beta)^{-alpha}*(beta+kappa)/(alpha-1), "\n")
-#
-#   #### xi
-#   1/alpha
-#   boxplot(par_ests_sims_no_trf[,1])
-#   abline(h=1/alpha, col = "red")
-#   mean(par_ests_sims_no_trf[,1])
-#   sd(par_ests_sims_no_trf[,1])
-#
-#   #### sigma
-#   (beta+kappa)/alpha
-#   boxplot(par_ests_sims_no_trf[,2])
-#   abline(h=(beta+kappa)/alpha, col = "red")
-#   mean(par_ests_sims_no_trf[,2])
-#   sd(par_ests_sims_no_trf[,2])
-#   # OBS: depending on fitting procedure used: over or under estimation happening gPdtest::gpd.fit and fExtremes::gpdFit
-#
-#
-#   ### transformation
-#   par_ests_sims_trf <- matrix(0, ncol = 2, nrow = n_sims)
-#   for(i in 1:n_sims){
-#     gen_exc_trf <- rlexceed(alpha = alpha,
-#                             beta = beta,
-#                             kappa = kappa,
-#                             trawl_fs = trawl_1,
-#                             trawl_fs_prim = trawl_1_prim,
-#                             times = times,
-#                             n = 1,
-#                             transformation = T)
-#     par_ests_sims_trf[i,] <- fExtremes::gpdFit(gen_exc_trf, u =1e-6)@fit$par.ests
-#   }
-#
-#   #### xi
-#   10
-#   1/alpha
-#   boxplot(par_ests_sims_trf[,1])
-#   abline(h=1/alpha, col = "red")
-#   mean(par_ests_sims_trf[,1])
-#   sd(par_ests_sims_trf[,1])
-#
-#   #### sigma
-#   (beta+kappa)/alpha
-#   (beta)/alpha
-#   boxplot(par_ests_sims_trf[,2])
-#   abline(h=(beta)/alpha, col = "red")
-#   mean(par_ests_sims_trf[,2])
-#   sd(par_ests_sims_trf[,2])
-# }

@@ -1,7 +1,7 @@
 # source("./R/simulation_latent_trawl.R")
+library("eva")
 
 context("Trawl functions")
-
 test_that("Exp trawl function rho positive", {
   t <- 10
   rho <- -0.2
@@ -167,9 +167,115 @@ test_that("Reconstruction using SliceArea for GIG marginals", {
   values <- TrawlSliceReconstruct(alpha = alpha, beta = beta, times = times,
                                   marg.dist = marg, n = n, trawl_fs = trawl.fs,
                                   trawl_fs_prim = trawl.fs.prim)
-  to.compare <- rgig(n = n.timestamps, lambda = 0, chi = alpha, psi = beta)
+  to.compare <- ghyp::rgig(n = n.timestamps, lambda = -0.5, chi = alpha, psi = beta)
   expect_gte(ks.test(values, to.compare)$p.value, 0.05)
 })
 
+test_that("ACF for Gamma trawl", {
+  set.seed(42)
+
+  # params:
+  alpha <- 3
+  beta <- 2
+  kappa <- 0
+  n.timestamps <- 3000
+  times <- 1:n.timestamps
+  n <- 1
+
+  depth.acf <- 30
+
+  rho <- 0.2
+  trawl.fs <- CollectionTrawl(times = times, params = list(rho=rho), type = "exp")
+  trawl.fs.prim <- CollectionTrawl(times = times, params = list(rho=rho), type = "exp", prim = T)
+
+  # marginals:
+  marg <- "gamma"
+
+  values <- TrawlSliceReconstruct(alpha = alpha, beta = beta, times = times,
+                                  marg.dist = marg, n = n, trawl_fs = trawl.fs,
+                                  trawl_fs_prim = trawl.fs.prim)
+  acf.vals <- as.vector(acf(values, lag.max = depth.acf)$acf)
+
+  expect_lte(mean((acf.vals - exp(-rho * 0:depth.acf))^2), 1e-2)
+})
+
+
+context("Simulation from mainstream functions")
+test_that("Regression test rtrawl/TrawlSliceReconstruct", {
+  set.seed(42)
+
+  # params:
+  alpha <- 3
+  beta <- 2
+  kappa <- 0
+  n.timestamps <- 100
+  times <- 1:n.timestamps
+  n <- 1
+
+  rho <- 0.2
+  trawl.fs <- CollectionTrawl(times = times, params = list(rho=rho), type = "exp")
+  trawl.fs.prim <- CollectionTrawl(times = times, params = list(rho=rho), type = "exp", prim = T)
+
+  # marginals:
+  marg <- "gamma"
+
+  tsr.vals <- TrawlSliceReconstruct(alpha = alpha, beta = beta, times = times,
+                                  marg.dist = marg, n = n, trawl_fs = trawl.fs,
+                                  trawl_fs_prim = trawl.fs.prim)
+
+  # reset
+  set.seed(42)
+  rt.vals <- rtrawl(alpha = alpha, beta = beta, rho = rho, n = n,
+                    times, times = times, marg.dist = marg, trawl.function = "exp")
+  expect_equal(tsr.vals, rt.vals)
+})
+
+test_that("rlrawl using trawl.function", {
+  set.seed(42)
+
+  # params:
+  alpha <- 3
+  beta <- 2
+  kappa <- 0
+  n.timestamps <- 100
+  times <- 1:n.timestamps
+  n <- 1
+
+  rho <- 0.2
+  trawl.fs <- CollectionTrawl(times = times, params = list(rho=rho), type = "exp")
+  trawl.fs.prim <- CollectionTrawl(times = times, params = list(rho=rho), type = "exp", prim = T)
+
+  # marginals:
+  marg <- "gamma"
+
+  tsr.vals <- rtrawl(alpha = alpha, beta = beta, times = times,
+                    marg.dist = marg, n = n, trawl_fs = trawl.fs,
+                    trawl_fs_prim = trawl.fs.prim)
+
+  # reset
+  set.seed(42)
+  rt.vals <- rtrawl(alpha = alpha, beta = beta, rho = rho, n = n,
+                    times, times = times, marg.dist = marg, trawl.function = "exp")
+  expect_equal(tsr.vals, rt.vals)
+})
+
+
+test_that("rlexceed GPD test", {
+ alpha <- 3
+ beta <- 6
+ kappa <- 5
+ rho <- 0.2
+ n.timestamps <- 3000
+ times <- 1:n.timestamps
+ n <- 1
+
+ rho <- 0.2
+ values <- rlexceed(alpha = alpha, beta = beta, kappa = kappa, rho = rho,
+                    times = times, n = n, transformation = F, marg.dist = "gamma",
+                    trawl.function = "exp")
+
+ expect_gte(eva::gpdAd(data = values[values>0], bootstrap = T, bootnum = 300,
+                       allowParallel = T, numCores = 7)$p.value, 0.1)
+})
 
 
