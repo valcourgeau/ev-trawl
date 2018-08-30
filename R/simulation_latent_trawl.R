@@ -2,7 +2,6 @@ setwd("~/GitHub/ev.trawl/R/")
 source('pairwise_latent_trawl.R')
 
 library("ghyp")
-library("evir")
 
 #' Sample Gamma with small shape parameter \code{alpha*dx*dy}.
 #'
@@ -364,6 +363,8 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, tr
 #' kappa <- 0
 #' rtrawl(alpha = alpha, beta = beta, kappa = kappa, marginals = margi,
 #'  trawl.function = trawl.function)
+#'
+#' @export
 rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl_fs=NA, trawl_fs_prim=NA, n, rho=NA,
                    kappa = 0, transformation=F, offset_shape=NULL, offset_scale=NULL, deep_cols=30){
   if(!is.na(trawl.function)){
@@ -436,10 +437,19 @@ rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl_fs=NA
 #'
 #' @returns Simulated path (size the same as times) of latent-trawl extreme
 #'   value process.
-#' @example TODO
-rlexceed <- function(alpha, beta, kappa, rho=NA, times, marg.dist,  n, transformation,
+#' @example alpha <- 3 beta <- 2 kappa <- 0.95 rho <- 0.2 n.timestamps <- 200
+#' times <- 1:n.timestamps
+#'
+#' marg.dist <- "gamma" n <- 1 transformation <- F trawl.function <- "exp"
+#'
+#' rlexceed(alpha = alpha, beta = beta, kappa = kappa, rho = rho, times = times,
+#'          marg.dist = marg.dist, n = n, transformation = transformation,
+#'          trawl.functon= "exp)
+#'
+#' @export
+rlexceed <- function(alpha, beta, kappa, rho=NA, times, marg.dist, n, transformation,
                      trawl.function=NA, trawl_fs=NA, trawl_fs_prim=NA, n_moments = 4, deep_cols=30){
-  # TODO n is not implemented yet
+  # TODO n > 1 is not implemented yet
   offset_shape <- n_moments+1
   offset_scale <- TrfFindOffsetScale(alpha = alpha,
                                         beta = beta,

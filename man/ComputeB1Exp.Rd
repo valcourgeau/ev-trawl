@@ -25,4 +25,5 @@ under exponential trawl function.
 \examples{
 ComputeB1Exp(1, t1 = 3, t2 = 5)
 ComputeB1Exp(0.2, t1 = 7, t2 = 3)
+
 }

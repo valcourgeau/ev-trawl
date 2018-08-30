@@ -25,4 +25,5 @@ under exponential trawl function.
 \examples{
 ComputeBInterExp(1, t1 = 3, t2 = 5)
 ComputeBInterExp(0.2, t1 = 7, t2 = 3)
+
 }

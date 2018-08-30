@@ -152,6 +152,8 @@ test_that("Reconstruction using SliceArea for GIG marginals", {
   if(!gig.implemented) skip("GIG not yet implemented")
   set.seed(42)
 
+  requireNamespace("ghyp", quietly = TRUE) # test if ghyp is installed
+
   # params:
   alpha <- 3
   beta <- 2

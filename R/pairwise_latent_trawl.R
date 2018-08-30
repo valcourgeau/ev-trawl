@@ -1,5 +1,3 @@
-library(fExtremes)
-library(evir)
 
 std_model_params_names <- c("alpha", "beta", "rho", "kappa")
 
@@ -12,6 +10,7 @@ std_model_params_names <- c("alpha", "beta", "rho", "kappa")
 #' @examples
 #' ComputeAExp(1) # should be 1.0
 #' ComputeAExp(0.2) # should be 5.0.
+#' @export
 ComputeAExp <- function(rho){
   if(rho < 0) stop ('rho should be non-negative.')
   return(1 / rho)
@@ -29,6 +28,8 @@ ComputeAExp <- function(rho){
 #' @examples
 #' ComputeB3Exp(1, t1 = 3, t2 = 5)
 #' ComputeB3Exp(0.2, t1 = 7, t2 = 3)
+#'
+#' @export
 ComputeB3Exp <- function(rho, t1, t2){
   if(rho < 0) stop('rho should be non-negative.')
 
@@ -55,6 +56,8 @@ ComputeB3Exp <- function(rho, t1, t2){
 #' @examples
 #' ComputeB1Exp(1, t1 = 3, t2 = 5)
 #' ComputeB1Exp(0.2, t1 = 7, t2 = 3)
+#'
+#' @export
 ComputeB1Exp <- function(rho, t1, t2){
   if(rho < 0) stop('rho should be non-negative.')
   # Compute A_t_1 \ A_t_2
@@ -73,6 +76,8 @@ ComputeB1Exp <- function(rho, t1, t2){
 #' @examples
 #' ComputeBInterExp(1, t1 = 3, t2 = 5)
 #' ComputeBInterExp(0.2, t1 = 7, t2 = 3)
+#'
+#' @export
 ComputeBInterExp <- function(rho, t1, t2){
   if(rho < 0) stop('rho should be non-negative.')
 
@@ -173,6 +178,8 @@ TrfFindOffsetScale <- function(alpha, beta, kappa, offset_shape){
 #'
 #' @return GPD pdf function evaluated at x with shape and scale parameters respectively alpha and beta.
 #' @example dlgpd(2.34, alpha = 1, beta = 2)
+#'
+#' @export
 dlgpd <- function(x, alpha, beta){
   if(beta <= 0) stop('beta should be positive.')
   return(abs(alpha)/beta*max(0,(1+sign(alpha)*x/beta))^{-alpha-1.0})
@@ -187,6 +194,8 @@ dlgpd <- function(x, alpha, beta){
 #'
 #' @return GPD CDF function evaluated at x with shape and scale parameters respectively alpha and beta.
 #' @example plgpd(2.34, alpha = 1, beta = 2)
+#'
+#' @export
 plgpd <- function(x, alpha, beta, lower.tail=F){
   res <- 1-(1+x/beta)^{-alpha}
   if(lower.tail){
@@ -259,6 +268,8 @@ PairwiseZeroZero2 <- function(alpha, beta, kappa, B1, B2, B3){
 #'
 #' @return Second part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.
 #' @example PairwiseZeroZero(alpha = 3.2, beta = 2, kappa = 3, B1=0.3, B2=0.7, B3=0.3)
+#'
+#' @export
 PairwiseZeroZero <- function(alpha, beta, kappa, B1, B2, B3, transformation=F, n.moments=0){
   if(transformation){
     alpha <- n.moments+1
@@ -388,6 +399,8 @@ PairwiseOneZero2 <- function(x1, alpha, beta, kappa, B1, B2, B3, trawlA){
 #' @return Second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}
 #' with exponential trawl function.
 #' @example PairwiseOneZero(x1=0.5, alpha=0.3, beta=2, kappa=3, B1=0.3, B2=0.7, B3=0.3)
+#'
+#' @export
 PairwiseOneZero <- function(x1, alpha, beta, kappa, B1, B2, B3, transformation=F, n_moments=4){
   # Marginal Transformation
   if(transformation){
@@ -611,6 +624,8 @@ PairwiseOneOne2 <- function(x1, x2, alpha, beta, kappa, B1, B2, B3){
 #'   and \code{y > 0}.
 #' @example PairwiseOneOne(t1=1, x1=0.5, t2=4, x2=0.3, alpha=2, beta=3,
 #'   kappa=3.5, rho=0.2, T, 4)
+#'
+#' @export
 PairwiseOneOne <- function(x1, x2, alpha, beta, kappa, B1, B2, B3, transformation=F, n_moments=4){
   # Marginal Transformation
   if(transformation){
@@ -670,6 +685,8 @@ PairwiseOneOne <- function(x1, x2, alpha, beta, kappa, B1, B2, B3, transformatio
 #' @return SINGLE latent trawl pairwise likelihood depending on \code{(x1,x2)}.
 #' @examples SinglePairPL(t1=1, x1=0.5, t2=4, alpha=0.3, beta=2, kappa=3, B1=0.3, B2=0.7, B3=0.3, F)
 #' SinglePairPL(t1=0.1, x1=2.0, t2=0.3, x2=1.0, alpha=-2., beta=3., kappa=3,, T)
+#'
+#' @export
 SinglePairPL <- function(x1, x2, alpha, beta, kappa, B1, B2, B3, transformation=F, n.moments=0){
   # TODO check whether t1 should be <= t2 or not
   #print(x1)
@@ -707,6 +724,8 @@ SinglePairPL <- function(x1, x2, alpha, beta, kappa, B1, B2, B3, transformation=
 #' @return Full latent trawl pairwise likelihood.
 #' @example FullPL(times=1:10, values = seq(from=0.1, to=5, by=0.5), alpha=0.3,
 #'   beta=2, kappa=3, rho=0.2, delta=2, T, F, "exp")
+#'
+#' @export
 FullPL <- function(times, values, alpha, beta, kappa, rho, delta, logscale=T, transformation=F, trawl.function="exp"){
   ok_ind <- which(!is.na(values))
   values <- values[ok_ind]
@@ -766,7 +785,9 @@ FullPL <- function(times, values, alpha, beta, kappa, rho, delta, logscale=T, tr
 #'
 #' @return Pairwise Likelihood as per FullPL using a list of parameters instead.
 #' @example ParamsListFullPL(c(1,2,3,4,5), c(0, 2.3, .3, 0, 5), delta=2,
-#'   params=list("alpha"=2,"beta"=3,"kappa"=1.5), T, F)
+#'   params=list("alpha"=2,"beta"=3,"kappa"=1.5, "rho"=0.2), T, F)
+#'
+#' @export
 ParamsListFullPL <- function(times, values, delta, params, logscale=T, transformation=F){
   # TODO add general model parameter names
   # TODO add trawl.function
@@ -802,6 +823,8 @@ ParamsListFullPL <- function(times, values, delta, params, logscale=T, transform
 #' <- c("alpha", "beta") params <- c(2.0, 3.4, 0.1, 4.3) model_vars_names <-
 #' c("alpha", "beta", "rho", "kappa") UnivariateFullPL(times, values, delta,
 #' fixed_names, params, model_vars_names, T, F)
+#'
+#' @export
 UnivariateFullPL <- function(times, values, delta, fixed_names, fixed_params, params, model_vars_names, logscale=T, transformation=F){
   if(length(fixed_names) > length(model_vars_names)) stop('Too many fixed parameters compared to number of model params.')
   if(length(fixed_params) + length(params) != length(model_vars_names)) stop('Wrong number of params compared to model specs.')
