@@ -2,16 +2,13 @@
 % Please edit documentation in R/pairwise_latent_trawl.R
 \name{PairwiseOneZero2}
 \alias{PairwiseOneZero2}
-\title{Computes second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}.}
+\title{Computes second term in latent trawl pairwise likelihood with \code{(x,0)}
+where \code{x > 0}.}
 \usage{
-PairwiseOneZero2(t1, x1, t2, alpha, beta, kappa, rho, trawlA, B1, B2, B3)
+PairwiseOneZero2(x1, alpha, beta, kappa, B1, B2, B3, trawlA)
 }
 \arguments{
-\item{t1}{First timestamp.}
-
 \item{x1}{Positive value corresponding to \code{t1}.}
-
-\item{t2}{Second timestamp.}
 
 \item{alpha}{Shape parameter. Should be positive.}
 
@@ -19,19 +16,19 @@ PairwiseOneZero2(t1, x1, t2, alpha, beta, kappa, rho, trawlA, B1, B2, B3)
 
 \item{kappa}{Exceedance probability parameter. Should be positive.}
 
-\item{rho}{Exponential trawl parameter. Should be positive.}
-
-\item{trawlA}{Total trawl set measure / area under trawl function.}
-
 \item{B1}{Difference area between \code{t1} and \code{t2} (in this order).}
 
 \item{B2}{intersection area between \code{t1} and \code{t2} (in this order).}
 
 \item{B3}{Difference area between \code{t2} and \code{t1} (in this order).}
+
+\item{trawlA}{Total trawl set measure / area under trawl function.}
 }
 \value{
-Second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}.
+Second term in latent trawl pairwise likelihood with \code{(x,0)}
+  where \code{x > 0}.
 }
 \description{
-Computes second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}.
+Computes second term in latent trawl pairwise likelihood with \code{(x,0)}
+where \code{x > 0}.
 }

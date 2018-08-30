@@ -4,20 +4,14 @@
 \alias{PairwiseZeroZero2}
 \title{Computes second part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.}
 \usage{
-PairwiseZeroZero2(t1, t2, alpha, beta, kappa, rho, B1, B2, B3)
+PairwiseZeroZero2(alpha, beta, kappa, B1, B2, B3)
 }
 \arguments{
-\item{t1}{First timestamp.}
-
-\item{t2}{Second timestamp.}
-
 \item{alpha}{Shape parameter. Should be positive.}
 
 \item{beta}{Latent Gamma scale parameter. Should be positive.}
 
 \item{kappa}{Exceedance probability parameter. Should be positive.}
-
-\item{rho}{Exponential trawl parameter. Should be positive.}
 
 \item{B1}{Difference area between times \code{t1} and \code{t2}.}
 

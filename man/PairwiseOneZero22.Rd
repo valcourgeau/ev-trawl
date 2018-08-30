@@ -4,14 +4,10 @@
 \alias{PairwiseOneZero22}
 \title{Computes partial part of second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}.}
 \usage{
-PairwiseOneZero22(t1, x1, t2, alpha, beta, kappa, rho, B2)
+PairwiseOneZero22(x1, alpha, beta, kappa, B2, trawlA)
 }
 \arguments{
-\item{t1}{First timestamp.}
-
 \item{x1}{Positive value corresponding to \code{t1}.}
-
-\item{t2}{Second timestamp.}
 
 \item{alpha}{Shape parameter. Should be positive.}
 
@@ -19,9 +15,9 @@ PairwiseOneZero22(t1, x1, t2, alpha, beta, kappa, rho, B2)
 
 \item{kappa}{Exceedance probability parameter. Should be positive.}
 
-\item{rho}{Exponential trawl parameter. Should be positive.}
-
 \item{B2}{Intersection area between \code{t1} and \code{t2}.}
+
+\item{trawlA}{Total trawl set measure / area under trawl function.}
 }
 \value{
 Partial part of second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}.

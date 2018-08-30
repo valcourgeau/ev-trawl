@@ -2,7 +2,8 @@
 % Please edit documentation in R/pairwise_latent_trawl.R
 \name{MarginalGPDLikelihood}
 \alias{MarginalGPDLikelihood}
-\title{Computes Generalised Pareto (log-)likelihood on non-zero exceedances under independence.}
+\title{Computes Generalised Pareto (log-)likelihood on non-zero exceedances under
+independence.}
 \usage{
 MarginalGPDLikelihood(values, fixed_names, fixed_params, params,
   model_vars_names, logscale = T, transformation = F, n_moments = 4)
@@ -26,8 +27,10 @@ MarginalGPDLikelihood(values, fixed_names, fixed_params, params,
 using the Marginal Transform (MT) method.}
 }
 \value{
-Generalised Pareto (log-)likelihood on non-zero exceedances under independence.
+Generalised Pareto (log-)likelihood on non-zero exceedances under
+  independence.
 }
 \description{
-Computes Generalised Pareto (log-)likelihood on non-zero exceedances under independence.
+Computes Generalised Pareto (log-)likelihood on non-zero exceedances under
+independence.
 }

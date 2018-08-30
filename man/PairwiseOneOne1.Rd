@@ -4,14 +4,10 @@
 \alias{PairwiseOneOne1}
 \title{Computes first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}.}
 \usage{
-PairwiseOneOne1(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B2, B3)
+PairwiseOneOne1(x1, x2, alpha, beta, kappa, B1, B2, B3)
 }
 \arguments{
-\item{t1}{First timestamp.}
-
 \item{x1}{Positive value corresponding to \code{t1}.}
-
-\item{t2}{Second timestamp.}
 
 \item{x2}{Positive value corresponding to \code{t2}.}
 
@@ -20,8 +16,6 @@ PairwiseOneOne1(t1, x1, t2, x2, alpha, beta, kappa, rho, B1, B2, B3)
 \item{beta}{Latent Gamma scale parameter. Should be positive.}
 
 \item{kappa}{Exceedance probability parameter. Should be positive.}
-
-\item{rho}{Exponential trawl parameter. Should be positive.}
 
 \item{B1}{Difference area between \code{t1} and \code{t2} (in this order).}
 

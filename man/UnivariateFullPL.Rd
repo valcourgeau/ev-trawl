@@ -2,8 +2,8 @@
 % Please edit documentation in R/pairwise_latent_trawl.R
 \name{UnivariateFullPL}
 \alias{UnivariateFullPL}
-\title{Computes univariate latent trawl FULL pairwise likelihood depending with exponential trawl function
-with the option to fix some parameter values.}
+\title{Computes univariate latent trawl FULL pairwise likelihood depending with
+exponential trawl function with the option to fix some parameter values.}
 \usage{
 UnivariateFullPL(times, values, delta, fixed_names, fixed_params, params,
   model_vars_names, logscale = T, transformation = F)
@@ -13,7 +13,8 @@ UnivariateFullPL(times, values, delta, fixed_names, fixed_params, params,
 
 \item{values}{Vector of target values.}
 
-\item{delta}{Maximum depth of pairwise likelihood blocks. Should be positive natural integer.}
+\item{delta}{Maximum depth of pairwise likelihood blocks. Should be positive
+natural integer.}
 
 \item{fixed_names}{Vector of literal names of parameters to keep fixed.}
 
@@ -28,9 +29,10 @@ UnivariateFullPL(times, values, delta, fixed_names, fixed_params, params,
 \item{transformation}{Boolean to use the Marginal Transform (MT) method.}
 }
 \value{
-FULL latent trawl pairwise likelihood with some (or none) parameters fixed.
+FULL latent trawl pairwise likelihood with some (or none) parameters
+  fixed.
 }
 \description{
-Computes univariate latent trawl FULL pairwise likelihood depending with exponential trawl function
-with the option to fix some parameter values.
+Computes univariate latent trawl FULL pairwise likelihood depending with
+exponential trawl function with the option to fix some parameter values.
 }

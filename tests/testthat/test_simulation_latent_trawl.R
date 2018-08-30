@@ -1,6 +1,8 @@
 # source("./R/simulation_latent_trawl.R")
 library("eva")
 
+gig.implemented <- F # Flag for GIG implementation testing
+
 context("Trawl functions")
 test_that("Exp trawl function rho positive", {
   t <- 10
@@ -147,6 +149,7 @@ test_that("Reconstruction using SliceArea for Gaussian marginals", {
 })
 
 test_that("Reconstruction using SliceArea for GIG marginals", {
+  if(!gig.implemented) skip("GIG not yet implemented")
   set.seed(42)
 
   # params:
@@ -275,6 +278,8 @@ test_that("rlexceed GPD test", {
                     trawl.function = "exp")
 
  expect_gte(eva::gpdAd(data = values[values>0], bootstrap = T, bootnum = 300,
+                       allowParallel = T, numCores = 7)$p.value, 0.1)
+ expect_gte(eva::gpdCvm(data = values[values>0], bootstrap = T, bootnum = 300,
                        allowParallel = T, numCores = 7)$p.value, 0.1)
 })
 

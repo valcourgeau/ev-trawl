@@ -4,8 +4,8 @@
 \alias{SecondOrderMixedDiffVal}
 \title{Second-order bivariate differentiation calculation.}
 \usage{
-SecondOrderMixedDiffVal(value.c, value.x.p, value.x.m, value.y.p, value.y.m,
-  value.xy.p, value.xy.m, epsilon)
+SecondOrderMixedDiffVal(value.c, value.x.p, value.x.m, value.y.p,
+  value.y.m, value.xy.p, value.xy.m, epsilon)
 }
 \arguments{
 \item{value.c}{function value at \code{(x,y)}.}

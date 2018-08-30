@@ -4,22 +4,16 @@
 \alias{PairwiseOneZero1}
 \title{Computes first part of latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}.}
 \usage{
-PairwiseOneZero1(t1, x1, t2, alpha, beta, kappa, rho, trawlA)
+PairwiseOneZero1(x1, alpha, beta, kappa, trawlA)
 }
 \arguments{
-\item{t1}{First timestamp.}
-
 \item{x1}{Positive value corresponding to \code{t1}.}
-
-\item{t2}{Second timestamp.}
 
 \item{alpha}{Shape parameter. Should be positive.}
 
 \item{beta}{Latent Gamma scale parameter. Should be positive.}
 
 \item{kappa}{Exceedance probability parameter. Should be positive.}
-
-\item{rho}{Exponential trawl parameter. Should be positive.}
 
 \item{trawlA}{Total trawl set measure / area under trawl function.}
 }

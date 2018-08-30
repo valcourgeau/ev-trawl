@@ -2,10 +2,11 @@
 % Please edit documentation in R/pairwise_latent_trawl.R
 \name{FullPL}
 \alias{FullPL}
-\title{Computes latent trawl FULL pairwise likelihood depending with exponential trawl function.}
+\title{Computes latent trawl FULL pairwise likelihood depending with exponential
+trawl function.}
 \usage{
 FullPL(times, values, alpha, beta, kappa, rho, delta, logscale = T,
-  transformation = F)
+  transformation = F, trawl.function = "exp")
 }
 \arguments{
 \item{times}{Vector of timestamps.}
@@ -18,17 +19,20 @@ FullPL(times, values, alpha, beta, kappa, rho, delta, logscale = T,
 
 \item{kappa}{Exceedance probability parameter. Should be positive.}
 
-\item{rho}{Exponential trawl parameter. Should be positive.}
+\item{rho}{Trawl parameter(s). For \code{trawl.function="exp"}, it should be
+positive.}
 
-\item{delta}{Maximum depth of pairwise likelihood blocks. Should be positive natural integer.}
+\item{delta}{Maximum depth of pairwise likelihood blocks. Should be positive
+natural integer.}
 
 \item{logscale}{Boolean to use logscale (log-likelihood). Default \code{T}.}
 
 \item{transformation}{Boolean to use the Marginal Transform (MT) method.}
 }
 \value{
-FULL latent trawl pairwise likelihood.
+Full latent trawl pairwise likelihood.
 }
 \description{
-Computes latent trawl FULL pairwise likelihood depending with exponential trawl function.
+Computes latent trawl FULL pairwise likelihood depending with exponential
+trawl function.
 }

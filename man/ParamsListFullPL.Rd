@@ -12,7 +12,8 @@ ParamsListFullPL(times, values, delta, params, logscale = T,
 
 \item{values}{Vector of target values.}
 
-\item{delta}{Maximum depth of pairwise likelihood blocks. Should be positive natural integer.}
+\item{delta}{Maximum depth of pairwise likelihood blocks. Should be positive
+natural integer.}
 
 \item{params}{List of parameters.}
 

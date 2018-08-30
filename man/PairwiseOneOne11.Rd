@@ -4,14 +4,10 @@
 \alias{PairwiseOneOne11}
 \title{Computes frst part of first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}.}
 \usage{
-PairwiseOneOne11(t1, x1, t2, x2, alpha, beta, kappa, rho, B1)
+PairwiseOneOne11(x1, x2, alpha, beta, kappa, B1, trawlA)
 }
 \arguments{
-\item{t1}{First timestamp.}
-
 \item{x1}{Positive value corresponding to \code{t1}.}
-
-\item{t2}{Second timestamp.}
 
 \item{x2}{Positive value corresponding to \code{t2}.}
 
@@ -21,9 +17,9 @@ PairwiseOneOne11(t1, x1, t2, x2, alpha, beta, kappa, rho, B1)
 
 \item{kappa}{Exceedance probability parameter. Should be positive.}
 
-\item{rho}{Exponential trawl parameter. Should be positive.}
-
 \item{B1}{Difference area between \code{t1} and \code{t2} (in this order).}
+
+\item{trawlA}{Total trawl set measure / area under trawl function.}
 }
 \value{
 Frst part of first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}.

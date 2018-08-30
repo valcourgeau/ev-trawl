@@ -2,17 +2,14 @@
 % Please edit documentation in R/pairwise_latent_trawl.R
 \name{SinglePairPL}
 \alias{SinglePairPL}
-\title{Computes correct latent trawl SINGLE pairwise likelihood depending on the values of \code{(x1,x2)}
-with exponential trawl function.}
+\title{Computes correct latent trawl SINGLE pairwise likelihood depending on the
+values of \code{(x1,x2)} with exponential trawl function.}
 \usage{
-SinglePairPL(t1, x1, t2, x2, alpha, beta, kappa, rho, transformation = F)
+SinglePairPL(x1, x2, alpha, beta, kappa, B1, B2, B3, transformation = F,
+  n.moments = 0)
 }
 \arguments{
-\item{t1}{First timestamp.}
-
 \item{x1}{Positive value corresponding to \code{t1}.}
-
-\item{t2}{Second timestamp.}
 
 \item{x2}{Positive value corresponding to \code{t2}.}
 
@@ -22,14 +19,18 @@ SinglePairPL(t1, x1, t2, x2, alpha, beta, kappa, rho, transformation = F)
 
 \item{kappa}{Exceedance probability parameter. Should be positive.}
 
-\item{rho}{Exponential trawl parameter. Should be positive.}
-
 \item{transformation}{Boolean to use the Marginal Transform (MT) method.}
+
+\item{n.moments}{Number of finite moments for transformed marginals.}
 }
 \value{
 SINGLE latent trawl pairwise likelihood depending on \code{(x1,x2)}.
 }
 \description{
-Computes correct latent trawl SINGLE pairwise likelihood depending on the values of \code{(x1,x2)}
-with exponential trawl function.
+Computes correct latent trawl SINGLE pairwise likelihood depending on the
+values of \code{(x1,x2)} with exponential trawl function.
+}
+\examples{
+SinglePairPL(t1=1, x1=0.5, t2=4, alpha=0.3, beta=2, kappa=3, B1=0.3, B2=0.7, B3=0.3, F)
+SinglePairPL(t1=0.1, x1=2.0, t2=0.3, x2=1.0, alpha=-2., beta=3., kappa=3,, T)
 }
