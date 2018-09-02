@@ -63,7 +63,7 @@ test_that("Slice area value", {
   rho <- 0.2
   tt.prim <- TrawlExpPrimitive(t=timestamps[1], rho=rho)
   theoretical.val <- 1/rho - exp(rho*(timestamps[1]-timestamps[2]))/rho
-  expect_equal(SliceArea(i=1, j=1, times = timestamps, trawl_f_prim = tt.prim), theoretical.val)
+  expect_equal(SliceArea(i=1, j=1, times = timestamps, trawl.f.prim = tt.prim), theoretical.val)
 })
 
 test_that("Reconstruction with wrong marginals", {
@@ -85,8 +85,8 @@ test_that("Reconstruction with wrong marginals", {
   marg <- "wrong marg"
 
   expect_error(TrawlSliceReconstruct(alpha = alpha, beta = beta, times = times,
-                                  marg.dist = marg, n = n, trawl_fs = trawl.fs,
-                                  trawl_fs_prim = trawl.fs.prim))
+                                  marg.dist = marg, n = n, trawl.fs = trawl.fs,
+                                  trawl.fs.prim = trawl.fs.prim))
 })
 
 test_that("Reconstruction using SliceArea for Gamma marginals", {
@@ -108,8 +108,8 @@ test_that("Reconstruction using SliceArea for Gamma marginals", {
   marg <- "gamma"
 
   values <- TrawlSliceReconstruct(alpha = alpha, beta = beta, times = times,
-                        marg.dist = marg, n = n, trawl_fs = trawl.fs,
-                        trawl_fs_prim = trawl.fs.prim)
+                        marg.dist = marg, n = n, trawl.fs = trawl.fs,
+                        trawl.fs.prim = trawl.fs.prim)
   to.compare <- rgamma(shape=alpha, rate=beta, n = n.timestamps)
   expect_gte(ks.test(values, "pgamma", alpha, beta)$p.value, 0.05)
 })
@@ -133,8 +133,8 @@ test_that("Reconstruction using SliceArea for Gaussian marginals", {
   marg <- "gaussian"
 
   values <- TrawlSliceReconstruct(alpha = alpha, beta = beta, times = times,
-                                  marg.dist = marg, n = n, trawl_fs = trawl.fs,
-                                  trawl_fs_prim = trawl.fs.prim)
+                                  marg.dist = marg, n = n, trawl.fs = trawl.fs,
+                                  trawl.fs.prim = trawl.fs.prim)
   to.compare <- rnorm(n = n.timestamps, alpha, beta)
   expect_gte(ks.test(values,to.compare)$p.value, 0.05)
 
@@ -142,8 +142,8 @@ test_that("Reconstruction using SliceArea for Gaussian marginals", {
   marg <- "normal"
 
   values <- TrawlSliceReconstruct(alpha = alpha, beta = beta, times = times,
-                                  marg.dist = marg, n = n, trawl_fs = trawl.fs,
-                                  trawl_fs_prim = trawl.fs.prim)
+                                  marg.dist = marg, n = n, trawl.fs = trawl.fs,
+                                  trawl.fs.prim = trawl.fs.prim)
   to.compare <- rnorm(n = n.timestamps, alpha, beta)
   expect_gte(ks.test(values,to.compare)$p.value, 0.05)
 })
@@ -170,8 +170,8 @@ test_that("Reconstruction using SliceArea for GIG marginals", {
   marg <- "gig"
 
   values <- TrawlSliceReconstruct(alpha = alpha, beta = beta, times = times,
-                                  marg.dist = marg, n = n, trawl_fs = trawl.fs,
-                                  trawl_fs_prim = trawl.fs.prim)
+                                  marg.dist = marg, n = n, trawl.fs = trawl.fs,
+                                  trawl.fs.prim = trawl.fs.prim)
   to.compare <- ghyp::rgig(n = n.timestamps, lambda = -0.5, chi = alpha, psi = beta)
   expect_gte(ks.test(values, to.compare)$p.value, 0.05)
 })
@@ -197,8 +197,8 @@ test_that("ACF for Gamma trawl", {
   marg <- "gamma"
 
   values <- TrawlSliceReconstruct(alpha = alpha, beta = beta, times = times,
-                                  marg.dist = marg, n = n, trawl_fs = trawl.fs,
-                                  trawl_fs_prim = trawl.fs.prim)
+                                  marg.dist = marg, n = n, trawl.fs = trawl.fs,
+                                  trawl.fs.prim = trawl.fs.prim)
   acf.vals <- as.vector(acf(values, lag.max = depth.acf)$acf)
 
   expect_lte(mean((acf.vals - exp(-rho * 0:depth.acf))^2), 1e-2)
@@ -225,8 +225,8 @@ test_that("Regression test rtrawl/TrawlSliceReconstruct", {
   marg <- "gamma"
 
   tsr.vals <- TrawlSliceReconstruct(alpha = alpha, beta = beta, times = times,
-                                  marg.dist = marg, n = n, trawl_fs = trawl.fs,
-                                  trawl_fs_prim = trawl.fs.prim)
+                                  marg.dist = marg, n = n, trawl.fs = trawl.fs,
+                                  trawl.fs.prim = trawl.fs.prim)
 
   # reset
   set.seed(42)
@@ -254,8 +254,8 @@ test_that("rlrawl using trawl.function", {
   marg <- "gamma"
 
   tsr.vals <- rtrawl(alpha = alpha, beta = beta, times = times,
-                    marg.dist = marg, n = n, trawl_fs = trawl.fs,
-                    trawl_fs_prim = trawl.fs.prim)
+                    marg.dist = marg, n = n, trawl.fs = trawl.fs,
+                    trawl.fs.prim = trawl.fs.prim)
 
   # reset
   set.seed(42)
@@ -266,6 +266,7 @@ test_that("rlrawl using trawl.function", {
 
 
 test_that("rlexceed GPD test", {
+  requireNamespace("eva", quietly = T)
  alpha <- 3
  beta <- 6
  kappa <- 5

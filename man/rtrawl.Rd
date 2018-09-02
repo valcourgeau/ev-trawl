@@ -5,7 +5,7 @@
 \title{Simulation of trawl process path using Slice partition.}
 \usage{
 rtrawl(alpha, beta, times, marg.dist, trawl.function = NA,
-  trawl_fs = NA, trawl_fs_prim = NA, n, rho = NA, kappa = 0,
+  trawl.fs = NA, trawl.fs.prim = NA, n, rho = NA, kappa = 0,
   transformation = F, offset_shape = NULL, offset_scale = NULL,
   deep_cols = 30)
 }
@@ -22,11 +22,11 @@ gaussian.}
 
 \item{trawl.function}{Type of trawl function that should be used. Default NA.}
 
-\item{trawl_fs}{collection of trawl functions indexed on \code{times}.
+\item{trawl.fs}{collection of trawl functions indexed on \code{times}.
 Default NA. Default NA if no \code{trawl.function} is indicated and should
 contain as many as in \code{times}.}
 
-\item{trawl_fs_prim}{collection of trawl functions primitives indexed on
+\item{trawl.fs.prim}{collection of trawl functions primitives indexed on
 \code{times}. Default NA if no \code{trawl.function} is indicated and
 should contain as many as in \code{times}.}
 

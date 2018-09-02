@@ -123,29 +123,29 @@ CollectionTrawl <- function(times, params, type, prim=F){
 #' @param j secondary index.
 #' @param times vector of discret times at which the trawl function is
 #'   partionned.
-#' @param trawl_f_prim Trawl function primitive.
+#' @param trawl.f.prim Trawl function primitive.
 #'
 #' @return Area of slice \code{S(i,j)} in Slice Partition method for trawl
 #'   functions.
 #' @examples SliceArea(1, 2, times=c(0, 1, 2, 3), TrawlExpPrimitive(t=2,
 #'   rho=0.2))
-SliceArea <- function(i, j, times, trawl_f_prim){
-  prim_info <- trawl_f_prim(NA)
+SliceArea <- function(i, j, times, trawl.f.prim){
+  prim_info <- trawl.f.prim(NA)
   origin_time <- prim_info$trawl_time
   # TODO make sure times are sorted before using this function
   # times <- sort(times)
   if(i != 1 & j != length(times)){
-    temp <- trawl_f_prim(times[i] - times[j] + origin_time)
-    temp <- temp - trawl_f_prim(times[i] - times[j+1] + origin_time)
-    temp <- temp - trawl_f_prim(times[i-1] - times[j] + origin_time)
-    temp <- temp + trawl_f_prim(times[i-1] - times[j+1] + origin_time)
+    temp <- trawl.f.prim(times[i] - times[j] + origin_time)
+    temp <- temp - trawl.f.prim(times[i] - times[j+1] + origin_time)
+    temp <- temp - trawl.f.prim(times[i-1] - times[j] + origin_time)
+    temp <- temp + trawl.f.prim(times[i-1] - times[j+1] + origin_time)
   }else{
-    temp <- trawl_f_prim(times[i] - times[j] + origin_time)
+    temp <- trawl.f.prim(times[i] - times[j] + origin_time)
     if(j != length(times)){
-      temp <- temp - trawl_f_prim(times[i] - times[j+1] + origin_time)
+      temp <- temp - trawl.f.prim(times[i] - times[j+1] + origin_time)
     }else{
       if(i == length(times)){
-        temp <- trawl_f_prim(origin_time) - trawl_f_prim(origin_time-times[i]+times[i-1])
+        temp <- trawl.f.prim(origin_time) - trawl.f.prim(origin_time-times[i]+times[i-1])
       }
     }
   }
@@ -163,8 +163,8 @@ SliceArea <- function(i, j, times, trawl_f_prim){
 #'   implemented: gamma, gaussian, generalised hyperbolic (ghyp), generalised
 #'   inverse gaussian (gig).
 #' @param n Number of simulations (so far, only \code{n=1} is implemented).
-#' @param trawl_fs collection of trawl functions indexed on \code{times}.
-#' @param trawl_fs_prim collection of trawl functions primitives indexed on
+#' @param trawl.fs collection of trawl functions indexed on \code{times}.
+#' @param trawl.fs.prim collection of trawl functions primitives indexed on
 #'   \code{times}.
 #' @param deep_cols Depth of reconstruction (columns). Default is 30.
 #'
@@ -174,14 +174,14 @@ SliceArea <- function(i, j, times, trawl_f_prim){
 #'   <- lapply(c(1,2,3,4), function(t) TrawlExpPrimitive(t, rho=0.2))
 #'   TrawlSliceReconstruct(alpha=3, beta=2, times=c(0, 1, 2, 3), marg.dist =
 #'   "gamma", n=1, fcts, prims)
-TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, trawl_fs_prim, deep_cols=30, ghyp.object=NA){
+TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl.fs, trawl.fs.prim, deep_cols=30, ghyp.object=NA){
   # TODO Add GIG compatibility
-  # TODO sort the trawl_fs and trawl_fs_prim as the times
+  # TODO sort the trawl.fs and trawl.fs.prim as the times
   requireNamespace("ghyp", quietly = TRUE)
   requireNamespace("stats", quietly = TRUE)
 
   if(n > 1) stop("Case n>1 not yet implemented.")
-  if(!is.list(trawl_fs_prim)) stop('Wrong type: trawl function primitives should be a list.')
+  if(!is.list(trawl.fs.prim)) stop('Wrong type: trawl function primitives should be a list.')
   if(!marg.dist %in% c("gamma", "normal", "gaussian", "gig", "ghyp")){
     stop(paste('marg.distr', marg.dist, 'not yet implemented.'))
   }else if(marg.dist == "ghyp" & class(ghyp::ghyp())[1] != "ghyp"){
@@ -190,7 +190,7 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, tr
 
   n_times <- length(times)
 
-  A <- trawl_fs[[1]](NA)$A # TODO A special for each timestep
+  A <- trawl.fs[[1]](NA)$A # TODO A special for each timestep
   slice_mat <- matrix(0, nrow = n_times, ncol = deep_cols)
   gamma_sim <- matrix(0, nrow = n_times, ncol = deep_cols)
 
@@ -198,7 +198,7 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, tr
   for(main_index in 1:n_times){
     for(second_index in 1:deep_cols){
       slice_mat[main_index, second_index] <- SliceArea(main_index, min(second_index + main_index - 1, n_times),
-                                                       times, trawl_fs_prim[[main_index]]) # TODO fix for last row
+                                                       times, trawl.fs.prim[[main_index]]) # TODO fix for last row
 
       # it suffices to implement new marginals here
       gamma_sim[main_index, second_index] <-
@@ -242,10 +242,10 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, tr
 #'   implemented: gamma, gaussian, generalised hyperbolic, generalised inverse
 #'   gaussian.
 #' @param trawl.function Type of trawl function that should be used. Default NA.
-#' @param trawl_fs collection of trawl functions indexed on \code{times}.
+#' @param trawl.fs collection of trawl functions indexed on \code{times}.
 #'   Default NA. Default NA if no \code{trawl.function} is indicated and should
 #'   contain as many as in \code{times}.
-#' @param trawl_fs_prim collection of trawl functions primitives indexed on
+#' @param trawl.fs.prim collection of trawl functions primitives indexed on
 #'   \code{times}. Default NA if no \code{trawl.function} is indicated and
 #'   should contain as many as in \code{times}.
 #' @param n Number of simulations (so far, only \code{n=1} is implemented).
@@ -268,16 +268,16 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, tr
 #'  trawl.function = trawl.function)
 #'
 #' @export
-rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl_fs=NA, trawl_fs_prim=NA, n, rho=NA,
+rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl.fs=NA, trawl.fs.prim=NA, n, rho=NA,
                    kappa = 0, transformation=F, offset_shape=NULL, offset_scale=NULL, deep_cols=30){
   if(!is.na(trawl.function)){
     if(trawl.function %in% c("exp")){
       if(is.na(rho)) stop('If trawl.function is not NA, need trawl parameters rho.')
       if(rho <= 0) stop('rho should be positive.')
 
-      trawl_fs <- CollectionTrawl(times = times,
+      trawl.fs <- CollectionTrawl(times = times,
                                   params = list("rho"=rho), type = trawl.function)
-      trawl_fs_prim <- CollectionTrawl(times = times,
+      trawl.fs.prim <- CollectionTrawl(times = times,
                                        params = list("rho"=rho), type = trawl.function,
                                        prim = T)
     }else{
@@ -285,10 +285,10 @@ rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl_fs=NA
     }
 
   }else{
-    if(length(trawl_fs) != length(times)){
+    if(length(trawl.fs) != length(times)){
       stop('Wrong number of trawl functions compared to timestamps.')
     }
-    if(length(trawl_fs_prim) != length(times)){
+    if(length(trawl.fs.prim) != length(times)){
       stop('Wrong number of trawl primitives compared to timestamps.')
     }
   }
@@ -302,16 +302,16 @@ rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl_fs=NA
                                       beta = beta+kappa,
                                       marg.dist = marg.dist,
                                       times = times,
-                                      trawl_fs = trawl_fs,
-                                      trawl_fs_prim = trawl_fs_prim,
+                                      trawl.fs = trawl.fs,
+                                      trawl.fs.prim = trawl.fs.prim,
                                       n = n, deep_cols)
   }else{
     results <- TrawlSliceReconstruct(alpha = offset_shape,
                                       beta = offset_scale,
                                       marg.dist = marg.dist,
                                       times = times,
-                                      trawl_fs = trawl_fs,
-                                      trawl_fs_prim = trawl_fs_prim,
+                                      trawl.fs = trawl.fs,
+                                      trawl.fs.prim = trawl.fs.prim,
                                       n = n, deep_cols)
   }
 
@@ -333,30 +333,34 @@ rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl_fs=NA
 #' @param transformation Boolean to apply marginal transform method. Default is
 #'   False (F).
 #' @param trawl.function Type of trawl function that should be used. Default NA.
-#' @param trawl_fs collection of trawl functions indexed on \code{times}.
-#' @param trawl_fs_prim collection of trawl functions primitives indexed on
+#' @param trawl.fs collection of trawl functions indexed on \code{times}.
+#' @param trawl.fs.prim collection of trawl functions primitives indexed on
 #'   \code{times}.
 #' @param n_moments Number of finite moments for transformed marginals.
 #' @param deep_cols Depth of reconstruction (columns). Default is 30.
 #'
 #' @return Simulated path (size the same as times) of latent-trawl extreme
 #'   value process.
-#' @examples alpha <- 3
+#' @examples
+#' alpha <- 3
 #' beta <- 2
 #' kappa <- 0.95
 #' rho <- 0.2
 #' n.timestamps <- 200
 #' times <- 1:n.timestamps
 #'
-#' marg.dist <- "gamma" n <- 1 transformation <- F trawl.function <- "exp"
+#' marg.dist <- "gamma"
+#' n <- 1
+#' transformation <- F
+#' trawl.function <- "exp"
 #'
 #' rlexceed(alpha = alpha, beta = beta, kappa = kappa, rho = rho, times = times,
 #'          marg.dist = marg.dist, n = n, transformation = transformation,
-#'          trawl.functon= "exp)
+#'          trawl.function= trawl.function)
 #'
 #' @export
 rlexceed <- function(alpha, beta, kappa, rho=NA, times, marg.dist, n, transformation,
-                     trawl.function=NA, trawl_fs=NA, trawl_fs_prim=NA, n_moments = 4, deep_cols=30){
+                     trawl.function=NA, trawl.fs=NA, trawl.fs.prim=NA, n_moments = 4, deep_cols=30){
   requireNamespace("stats", quietly = T)
 
   # TODO n > 1 is not implemented yet
@@ -374,8 +378,8 @@ rlexceed <- function(alpha, beta, kappa, rho=NA, times, marg.dist, n, transforma
                        marg.dist = marg.dist,
                        times = times,
                        trawl.function = trawl.function,
-                       trawl_fs = trawl_fs,
-                       trawl_fs_prim = trawl_fs_prim,
+                       trawl.fs = trawl.fs,
+                       trawl.fs.prim = trawl.fs.prim,
                        n = n,
                        transformation = transformation,
                        offset_shape = offset_shape,

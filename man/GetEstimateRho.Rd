@@ -20,3 +20,8 @@ GetEstimateRho(alpha, beta, kappa, cluster.size, data)
 \description{
 Computes first-order estimate for \code{rho}.
 }
+\examples{
+# TODO ADD data
+GetEstimateRho(alpha = 5, beta = 2, kappa = 3, cluster.size = 8, data = NA)
+
+}

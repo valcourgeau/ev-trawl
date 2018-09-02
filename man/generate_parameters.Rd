@@ -16,3 +16,8 @@ generate_parameters(data, cluster.size)
 Computes initial guess for Univariate Latent-Trawl model.
 Uses \cdoe{fExtreme} package method \code{gpdFit} to fit MLE.
 }
+\examples{
+# TODO ADD data
+GenerateParameters(data = NA, cluster.size = 8)
+
+}

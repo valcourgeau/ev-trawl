@@ -5,8 +5,8 @@
 \title{Performs trawl slices reconstuction to get gamma samples using the
 independent measure scaterring.}
 \usage{
-TrawlSliceReconstruct(alpha, beta, times, marg.dist, n, trawl_fs,
-  trawl_fs_prim, deep_cols = 30, ghyp.object = NA)
+TrawlSliceReconstruct(alpha, beta, times, marg.dist, n, trawl.fs,
+  trawl.fs.prim, deep_cols = 30, ghyp.object = NA)
 }
 \arguments{
 \item{alpha}{(Gamma) Shape parameter.}
@@ -21,9 +21,9 @@ inverse gaussian (gig).}
 
 \item{n}{Number of simulations (so far, only \code{n=1} is implemented).}
 
-\item{trawl_fs}{collection of trawl functions indexed on \code{times}.}
+\item{trawl.fs}{collection of trawl functions indexed on \code{times}.}
 
-\item{trawl_fs_prim}{collection of trawl functions primitives indexed on
+\item{trawl.fs.prim}{collection of trawl functions primitives indexed on
 \code{times}.}
 
 \item{deep_cols}{Depth of reconstruction (columns). Default is 30.}

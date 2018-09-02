@@ -6,8 +6,8 @@
 marginals have scale parameter \code{1+kappa}.}
 \usage{
 rlexceed(alpha, beta, kappa, rho = NA, times, marg.dist, n,
-  transformation, trawl.function = NA, trawl_fs = NA,
-  trawl_fs_prim = NA, n_moments = 4, deep_cols = 30)
+  transformation, trawl.function = NA, trawl.fs = NA,
+  trawl.fs.prim = NA, n_moments = 4, deep_cols = 30)
 }
 \arguments{
 \item{alpha}{Shape parameter.}
@@ -31,9 +31,9 @@ False (F).}
 
 \item{trawl.function}{Type of trawl function that should be used. Default NA.}
 
-\item{trawl_fs}{collection of trawl functions indexed on \code{times}.}
+\item{trawl.fs}{collection of trawl functions indexed on \code{times}.}
 
-\item{trawl_fs_prim}{collection of trawl functions primitives indexed on
+\item{trawl.fs.prim}{collection of trawl functions primitives indexed on
 \code{times}.}
 
 \item{n_moments}{Number of finite moments for transformed marginals.}
@@ -47,4 +47,22 @@ Simulated path (size the same as times) of latent-trawl extreme
 \description{
 Simulation of extreme value path using latent trawl process. Transformed
 marginals have scale parameter \code{1+kappa}.
+}
+\examples{
+alpha <- 3
+beta <- 2
+kappa <- 0.95
+rho <- 0.2
+n.timestamps <- 200
+times <- 1:n.timestamps
+
+marg.dist <- "gamma"
+n <- 1
+transformation <- F
+trawl.function <- "exp"
+
+rlexceed(alpha = alpha, beta = beta, kappa = kappa, rho = rho, times = times,
+         marg.dist = marg.dist, n = n, transformation = transformation,
+         trawl.function= trawl.function)
+
 }

@@ -5,7 +5,7 @@
 \title{Computes the area of a slice for the Slice Partition method of trawl
 functions.}
 \usage{
-SliceArea(i, j, times, trawl_f_prim)
+SliceArea(i, j, times, trawl.f.prim)
 }
 \arguments{
 \item{i}{main index.}
@@ -15,7 +15,7 @@ SliceArea(i, j, times, trawl_f_prim)
 \item{times}{vector of discret times at which the trawl function is
 partionned.}
 
-\item{trawl_f_prim}{Trawl function primitive.}
+\item{trawl.f.prim}{Trawl function primitive.}
 }
 \value{
 Area of slice \code{S(i,j)} in Slice Partition method for trawl
