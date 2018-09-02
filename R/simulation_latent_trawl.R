@@ -1,7 +1,5 @@
-setwd("~/GitHub/ev.trawl/R/")
-source('pairwise_latent_trawl.R')
-
-library("ghyp")
+#setwd("~/GitHub/ev.trawl/R/")
+#source('pairwise_latent_trawl.R')
 
 #' Sample Gamma with small shape parameter \code{alpha*dx*dy}.
 #'
@@ -156,104 +154,6 @@ SliceArea <- function(i, j, times, trawl_f_prim){
 
   return(temp)
 }
-#
-# trawl_slice_sets_not_optim <- function(alpha, beta, times, n, trawl_fs, trawl_fs_prim){
-#   # TODO sort the trawl_fs and trawl_fs_prim as the times
-#   # TODO current_trawl and going further back? instead of 8
-#
-#   if(!is.list(trawl_fs)) stop('Wrong type: trawl set should be a list.')
-#
-#   times <- sort(times)
-#   A <- trawl_fs[[1]](NA)$A
-#   slice_mat <- matrix(0, nrow = length(times), ncol = length(times))
-#   gamma_sim <- matrix(0, length(times) * length(times), ncol= n)
-#
-#   # Creating the matrix of gamma realisations
-#   for(main_index in 1:length(times)){
-#     for(second_index in main_index:length(times)){
-#       slice_mat[main_index, second_index] <- SliceArea(main_index, second_index, times, trawl_fs_prim[[main_index]])
-#       gamma_sim[(main_index-1) * length(times) + second_index,] <- rgamma(shape = alpha * slice_mat[main_index, second_index] / A,
-#                                                                           rate = beta,
-#                                                                           n = n)
-#     }
-#   }
-#
-#   # Going back in time to use the dep structure
-#   n_trawl_forward <- trawl_fs[[1]](NA)$time_eta
-#   results <- matrix(0, nrow = length(times), ncol = n)
-#   for(current_trawl in 1:length(times)){
-#     for(back_trawl in max(1, current_trawl-8+1):current_trawl){
-#       for(slice_piece in (current_trawl):min(floor(current_trawl+n_trawl_forward+1), length(times))){
-#         if(back_trawl != current_trawl | slice_piece > current_trawl){
-#           results[current_trawl,] <- results[current_trawl,] + gamma_sim[(back_trawl-1) * length(times) + slice_piece,]
-#         }
-#       }
-#     }
-#   }
-#
-#   # Using independent scattering of Levy basis to add time dependence to trawls
-#   for(main_index in 1:(length(times))){
-#     results[main_index,] <- results[main_index,] + gamma_sim[(main_index-1) * length(times)+main_index,]
-#   }
-#
-#   #results[length(times),] <- results[length(times), ] + gamma_sim[(length(times)-1) * length(times) + length(times),]
-#
-#   return(results)
-# }
-#
-# trawl_slice_sets_not_optim_2 <- function(alpha, beta, times, n, trawl_fs, trawl_fs_prim){
-#   # TODO sort the trawl_fs and trawl_fs_prim as the times
-#   # TODO current_trawl and going further back? instead of 8
-#
-#   if(!is.list(trawl_fs)) stop('Wrong type: trawl set should be a list.')
-#
-#   deep_cols <- 30 # TODO render this customisable
-#
-#   #times <- sort(times)
-#   A <- trawl_fs[[1]](NA)$A # TODO A special for each timestep
-#   slice_mat <- matrix(0, nrow = length(times), ncol = deep_cols)
-#   gamma_sim <- matrix(0, length(times) * deep_cols, ncol= n)
-#
-#   # Creating the matrix of gamma realisations
-#   for(main_index in 1:length(times)){
-#     for(second_index in 1:deep_cols){
-#       slice_mat[main_index, second_index] <- SliceArea(main_index, min(second_index + main_index - 1, length(times)), times, trawl_fs_prim[[main_index]])
-#       #if(slice_mat[main_index, second_index] > 1e-3){
-#       #print(alpha * slice_mat[main_index, second_index] / A)
-#       gamma_sim[(main_index-1) * deep_cols + second_index,] <- rgamma(shape = alpha * slice_mat[main_index, second_index] / A,
-#                                                                       rate = beta,
-#                                                                       n = n)
-#       #}
-#     }
-#   }
-#
-#   # Going back in time to use the dep structure
-#   # n_trawl_forward <- trawl_fs[[1]](NA)$time_eta
-#   n_trawl_forward <- deep_cols # TODO remove this
-#
-#   # Using independent scattering of Levy basis to add time dependence to trawls
-#   results <- matrix(0, nrow = length(times), ncol = n)
-#   for(current_trawl in 1:length(times)){
-#     for(back_trawl in max(1, current_trawl-15+1):current_trawl){
-#       for(slice_piece in (current_trawl-back_trawl+1):min(deep_cols, length(times)-back_trawl+1)){
-#         if(back_trawl != current_trawl | slice_piece > 1){
-#           #if(sum(abs(gamma_sim[(back_trawl-1) * deep_cols + slice_piece,])) > 1e-16){
-#           results[current_trawl,] <- results[current_trawl,] + gamma_sim[(back_trawl-1) * deep_cols + slice_piece,]
-#           # }
-#         }
-#       }
-#     }
-#   }
-#
-#   # Adding the part that is unique to each column: the top
-#   for(main_index in 1:(length(times))){
-#     results[main_index,] <- results[main_index,] + gamma_sim[(main_index-1) * deep_cols + 1,]
-#   }
-#
-#   #results[length(times),] <- results[length(times), ] + gamma_sim[(length(times)-1) * length(times) + length(times),]
-#
-#   return(results)
-# }
 
 #' Performs trawl slices reconstuction to get gamma samples using the
 #' independent measure scaterring.
@@ -279,6 +179,8 @@ SliceArea <- function(i, j, times, trawl_f_prim){
 TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl_fs, trawl_fs_prim, deep_cols=30, ghyp.object=NA){
   # TODO Add GIG compatibility
   # TODO sort the trawl_fs and trawl_fs_prim as the times
+  requireNamespace("ghyp", quietly = TRUE)
+
   if(n > 1) stop("Case n>1 not yet implemented.")
   if(!is.list(trawl_fs_prim)) stop('Wrong type: trawl function primitives should be a list.')
   if(!marg.dist %in% c("gamma", "normal", "gaussian", "gig", "ghyp")){

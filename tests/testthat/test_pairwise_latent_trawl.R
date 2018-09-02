@@ -1,5 +1,5 @@
 #source("./R/pairwise_latent_trawl.R")
-library("evir")
+requireNamespace("eivr", quietly = T)
 
 context("Slice Area")
 test_that("rho must be non-negative in exp trawl",
