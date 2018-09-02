@@ -215,16 +215,19 @@ test_that("Regression test rtrawl/TrawlSliceReconstruct", {
   kappa <- 0
   n.timestamps <- 100
   times <- 1:n.timestamps
+  deep.cols <- 30
+  times.tsr <- 1:(n.timestamps+deep.cols)
   n <- 1
 
   rho <- 0.2
-  trawl.fs <- CollectionTrawl(times = times, params = list(rho=rho), type = "exp")
-  trawl.fs.prim <- CollectionTrawl(times = times, params = list(rho=rho), type = "exp", prim = T)
+  trawl.fs <- CollectionTrawl(times = times.tsr, params = list(rho=rho), type = "exp")
+  trawl.fs.prim <- CollectionTrawl(times = times.tsr, params = list(rho=rho), type = "exp", prim = T)
 
   # marginals:
   marg <- "gamma"
 
-  tsr.vals <- TrawlSliceReconstruct(alpha = alpha, beta = beta, times = times,
+  # Creates manually the extra trawl functions to reconstruct with a buffer.
+  tsr.vals <- TrawlSliceReconstruct(alpha = alpha, beta = beta, times = times.tsr,
                                   marg.dist = marg, n = n, trawl.fs = trawl.fs,
                                   trawl.fs.prim = trawl.fs.prim)
 
@@ -235,20 +238,23 @@ test_that("Regression test rtrawl/TrawlSliceReconstruct", {
   expect_equal(tsr.vals, rt.vals)
 })
 
-test_that("rlrawl using trawl.function", {
+test_that("rtrawl using trawl functions", {
   set.seed(42)
 
   # params:
   alpha <- 3
   beta <- 2
   kappa <- 0
+  deep.cols <- 30
   n.timestamps <- 100
   times <- 1:n.timestamps
+  deep.cols <- 30
+  times.custom <- 1:(n.timestamps+deep.cols)
   n <- 1
 
   rho <- 0.2
-  trawl.fs <- CollectionTrawl(times = times, params = list(rho=rho), type = "exp")
-  trawl.fs.prim <- CollectionTrawl(times = times, params = list(rho=rho), type = "exp", prim = T)
+  trawl.fs <- CollectionTrawl(times = times.custom, params = list(rho=rho), type = "exp")
+  trawl.fs.prim <- CollectionTrawl(times = times.custom, params = list(rho=rho), type = "exp", prim = T)
 
   # marginals:
   marg <- "gamma"
@@ -256,11 +262,15 @@ test_that("rlrawl using trawl.function", {
   tsr.vals <- rtrawl(alpha = alpha, beta = beta, times = times,
                     marg.dist = marg, n = n, trawl.fs = trawl.fs,
                     trawl.fs.prim = trawl.fs.prim)
-
+  n.tsr.vals <- length(tsr.vals)
+  expect_equal(n.timestamps, n.tsr.vals)
   # reset
   set.seed(42)
   rt.vals <- rtrawl(alpha = alpha, beta = beta, rho = rho, n = n,
                     times, times = times, marg.dist = marg, trawl.function = "exp")
+  n.rt.vals <- length(rt.vals)
+  expect_equal(n.timestamps, n.rt.vals)
+
   expect_equal(tsr.vals, rt.vals)
 })
 
@@ -278,7 +288,7 @@ test_that("rlexceed GPD test", {
  rho <- 0.2
  values <- rlexceed(alpha = alpha, beta = beta, kappa = kappa, rho = rho,
                     times = times, n = n, transformation = F, marg.dist = "gamma",
-                    trawl.function = "exp")
+                    trawl.function = "exp", deep_cols = deep.cols)
 
  expect_gte(eva::gpdAd(data = values[values>0], bootstrap = T, bootnum = 300,
                        allowParallel = F, numCores = 1)$p.value, 0.1)

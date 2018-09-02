@@ -159,35 +159,38 @@ SliceArea <- function(i, j, times, trawl.f.prim){
 #' @param trawl.fs collection of trawl functions indexed on \code{times}.
 #' @param trawl.fs.prim collection of trawl functions primitives indexed on
 #'   \code{times}.
-#' @param deep_cols Depth of reconstruction (columns). Default is 30.
-#' @param ghyp.object Object from \code{ghyp} package when using GH or GIG distributions.
+#' @param deep_cols Depth of reconstruction (columns). Default is 30 and must be
+#'   positive.
+#' @param ghyp.object Object from \code{ghyp} package when using GH or GIG
+#'   distributions.
 #'
 #' @return Samples using trawl slice reconstruction disributed using
 #'   \code{marginal}.
 TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl.fs, trawl.fs.prim, deep_cols=30, ghyp.object=NA){
   # TODO Add GIG compatibility
-  # TODO sort the trawl.fs and trawl.fs.prim as the times
+
   #requireNamespace("ghyp", quietly = TRUE)
   requireNamespace("stats", quietly = TRUE)
 
+  if(deep_cols <= 0) stop('deep_cols shoud be a positive integer.')
   if(n > 1) stop("Case n>1 not yet implemented.")
   if(!is.list(trawl.fs.prim)) stop('Wrong type: trawl function primitives should be a list.')
-  if(!as.vector(marg.dist) %in% c("gamma", "normal", "gaussian", "gig", "ghyp")){
+  if(!as.vector(marg.dist) %in% c("gamma", "normal", "gaussian")){
     stop(paste('marg.distr', marg.dist, 'not yet implemented.'))
   }else if(marg.dist == "ghyp" & class(ghyp::ghyp())[1] != "ghyp"){
     stop('ghyp.object should be an instance of ghyp::ghyp')
   }
 
-  n_times <- length(times)
+  n.times <- length(times)
 
   A <- trawl.fs[[1]](NA)$A # TODO A special for each timestep
-  slice_mat <- matrix(0, nrow = n_times, ncol = deep_cols)
-  gamma_sim <- matrix(0, nrow = n_times, ncol = deep_cols)
+  slice_mat <- matrix(0, nrow = n.times, ncol = deep_cols)
+  gamma_sim <- matrix(0, nrow = n.times, ncol = deep_cols)
 
   # Creating the matrix of gamma realisations
-  for(main_index in 1:n_times){
+  for(main_index in 1:(n.times)){
     for(second_index in 1:deep_cols){
-      slice_mat[main_index, second_index] <- SliceArea(main_index, min(second_index + main_index - 1, n_times),
+      slice_mat[main_index, second_index] <- SliceArea(main_index, min(second_index + main_index - 1, n.times),
                                                        times, trawl.fs.prim[[main_index]]) # TODO fix for last row
 
       # it suffices to implement new marginals here
@@ -213,7 +216,7 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl.fs, tr
   upper.anti.tri<-function(m){col(m)+row(m) < dim(m)[1]+1}
   anti_diag_mat <- matrix(1, deep_cols, deep_cols)
   anti_diag_mat[upper.anti.tri(anti_diag_mat)] <- 0
-  results <- vapply(1:(n_times - 1*deep_cols),
+  results <- vapply(1:(n.times - 1*deep_cols),
                     function(i){
                       return(sum(gamma_sim[i:(i - 1 + deep_cols),] * anti_diag_mat))
                     },
@@ -222,7 +225,11 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl.fs, tr
   return(results)
 }
 
-#' Simulation of trawl process path using Slice partition.
+#' Simulation of trawl process path using Slice partition. If using customised
+#' trawl functions and primitives (i.e. \code{trawl.function = NA}), then, it is
+#' required that the user provides \code{length(times) + deep_cols} such
+#' functions and primitives where the \code{deep_cols} first one are used to
+#' reconstuct the first trawl value.
 #'
 #' @param alpha Shape parameter.
 #' @param beta Scale parameter.
@@ -262,6 +269,8 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl.fs, tr
 #' @export
 rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl.fs=NA, trawl.fs.prim=NA, n, rho=NA,
                    kappa = 0, transformation=F, offset_shape=NULL, offset_scale=NULL, deep_cols=30){
+  times <- c(times[1]:(times[1]+deep_cols-1), times+deep_cols) # add buffer times before first time by shifting
+
   if(!is.na(trawl.function)){
     if(trawl.function == "exp"){
       if(is.na(rho)) stop('If trawl.function is not NA, need trawl parameters rho.')
@@ -379,11 +388,11 @@ rlexceed <- function(alpha, beta, kappa, rho=NA, times, marg.dist, n, transforma
 
   #return(gen_trawl)
   # Uniform threshold
-  unif_samples <- stats::runif(n=length(times)-deep_cols)
+  unif_samples <- stats::runif(n=length(times))
   if(n == 1){
-    gen_exceedances <- rep(0, length(times)-deep_cols)
+    gen_exceedances <- rep(0, length(times))
   }else{
-    gen_exceedances <- matrix(0, nrow = length(times)-deep_cols, ncol = n)
+    gen_exceedances <- matrix(0, nrow = length(times), ncol = n)
   }
 
   #print(gen_trawl)
