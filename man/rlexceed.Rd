@@ -58,7 +58,7 @@ times <- 1:n.timestamps
 
 marg.dist <- "gamma"
 n <- 1
-transformation <- F
+transformation <- FALSE
 trawl.function <- "exp"
 
 rlexceed(alpha = alpha, beta = beta, kappa = kappa, rho = rho, times = times,

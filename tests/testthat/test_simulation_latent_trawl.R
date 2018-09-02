@@ -281,9 +281,9 @@ test_that("rlexceed GPD test", {
                     trawl.function = "exp")
 
  expect_gte(eva::gpdAd(data = values[values>0], bootstrap = T, bootnum = 300,
-                       allowParallel = T, numCores = 7)$p.value, 0.1)
+                       allowParallel = F, numCores = 1)$p.value, 0.1)
  expect_gte(eva::gpdCvm(data = values[values>0], bootstrap = T, bootnum = 300,
-                       allowParallel = T, numCores = 7)$p.value, 0.1)
+                       allowParallel = F, numCores = 1)$p.value, 0.1)
 })
 
 

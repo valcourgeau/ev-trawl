@@ -117,13 +117,9 @@ EvaluateF <- function(f,
 #' @param epsilon Offset value for all components.
 #'
 #' @return Hessian matrix of function \code{f} at parameters \code{params} with offset \code{epsilon}.
-#'
-#' @examples
-#' HessianF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 1e-6)
-#' HessianF(function(params){sum(params^3)}, params = c(2.5, 7), epsilon = 1e-6)
 HessianF <- function(f,
-                      params,
-                      epsilon=1e-6){
+                     params,
+                     epsilon=1e-6){
   if(epsilon < 0.0) stop("Epsilon must be positive.")
 
   d <- length(params)

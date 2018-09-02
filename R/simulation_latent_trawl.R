@@ -172,7 +172,7 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl.fs, tr
 
   if(n > 1) stop("Case n>1 not yet implemented.")
   if(!is.list(trawl.fs.prim)) stop('Wrong type: trawl function primitives should be a list.')
-  if(!marg.dist %in% c("gamma", "normal", "gaussian", "gig", "ghyp")){
+  if(!as.vector(marg.dist) %in% c("gamma", "normal", "gaussian", "gig", "ghyp")){
     stop(paste('marg.distr', marg.dist, 'not yet implemented.'))
   }else if(marg.dist == "ghyp" & class(ghyp::ghyp())[1] != "ghyp"){
     stop('ghyp.object should be an instance of ghyp::ghyp')
@@ -250,18 +250,20 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl.fs, tr
 #' @examples
 #' alpha <- 5
 #' beta <- 3
-#' times <- 1:15
+#' times <- 1:150
+#' rho <- 0.2
 #' trawl.function <- "exp"
-#' margi <- rgamma
+#' margi <- "gamma"
 #' kappa <- 0
-#' rtrawl(alpha = alpha, beta = beta, kappa = kappa, marginals = margi,
-#'  trawl.function = trawl.function)
+#' n <- 1
+#' rtrawl(alpha = alpha, beta = beta, kappa = kappa, times = times, n = 1,
+#' marg.dist = margi, rho = rho, trawl.function = trawl.function)
 #'
 #' @export
 rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl.fs=NA, trawl.fs.prim=NA, n, rho=NA,
                    kappa = 0, transformation=F, offset_shape=NULL, offset_scale=NULL, deep_cols=30){
   if(!is.na(trawl.function)){
-    if(trawl.function %in% c("exp")){
+    if(trawl.function == "exp"){
       if(is.na(rho)) stop('If trawl.function is not NA, need trawl parameters rho.')
       if(rho <= 0) stop('rho should be positive.')
 
@@ -341,7 +343,7 @@ rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl.fs=NA
 #'
 #' marg.dist <- "gamma"
 #' n <- 1
-#' transformation <- F
+#' transformation <- FALSE
 #' trawl.function <- "exp"
 #'
 #' rlexceed(alpha = alpha, beta = beta, kappa = kappa, rho = rho, times = times,

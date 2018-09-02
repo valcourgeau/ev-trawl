@@ -587,8 +587,8 @@ PairwiseOneOne2 <- function(x1, x2, alpha, beta, kappa, B1, B2, B3){
   return(temp)
 }
 
-#' Computes latent trawl pairwise likelihood with \code{(x,x)} where
-#' \code{x > 0} and \code{y > 0} with exponential trawl function.
+#' Computes latent trawl pairwise likelihood with \code{(x,x)} where \code{x >
+#' 0} and \code{y > 0} with exponential trawl function.
 #'
 #' @param x1 Positive value corresponding to \code{t1}.
 #' @param x2 Positive value corresponding to \code{t2}.
@@ -604,8 +604,8 @@ PairwiseOneOne2 <- function(x1, x2, alpha, beta, kappa, B1, B2, B3){
 #'
 #' @return Latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0}
 #'   and \code{y > 0}.
-#' @examples PairwiseOneOne(t1=1, x1=0.5, t2=4, x2=0.3, alpha=2, beta=3,
-#'   kappa=3.5, rho=0.2, T, 4)
+#' @examples PairwiseOneOne(x1=0.5, x2=0.3, alpha=2, beta=3, B1 = 0.3, B2 = 0.7,
+#'                          B3 = 0.3, kappa=3.5)
 #'
 #' @export
 PairwiseOneOne <- function(x1, x2, alpha, beta, kappa, B1, B2, B3, transformation=F, n.moments=4){
@@ -668,8 +668,9 @@ PairwiseOneOne <- function(x1, x2, alpha, beta, kappa, B1, B2, B3, transformatio
 #' @param n.moments Number of finite moments for transformed marginals.
 #'
 #' @return SINGLE latent trawl pairwise likelihood depending on \code{(x1,x2)}.
-#' @examples SinglePairPL(t1=1, x1=0.5, t2=4, alpha=0.3, beta=2, kappa=3, B1=0.3, B2=0.7, B3=0.3, F)
-#' SinglePairPL(t1=0.1, x1=2.0, t2=0.3, x2=1.0, alpha=-2., beta=3., kappa=3,, T)
+#' @examples
+#' SinglePairPL(x1=0.5, x2= 0.3, alpha=0.3, beta=2, kappa=3, B1=0.3, B2=0.7, B3=0.3, FALSE)
+#' SinglePairPL(x1=2.0, x2=1.0, alpha=-2, beta=3., kappa=3,  B1=0.3, B2=0.7, B3=0.3, TRUE)
 #'
 #' @export
 SinglePairPL <- function(x1, x2, alpha, beta, kappa, B1, B2, B3, transformation=F, n.moments=0){
@@ -708,8 +709,8 @@ SinglePairPL <- function(x1, x2, alpha, beta, kappa, B1, B2, B3, transformation=
 #' @param transformation Boolean to use the Marginal Transform (MT) method.
 #'
 #' @return Full latent trawl pairwise likelihood.
-#' @examples FullPL(times=1:10, values = seq(from=0.1, to=5, by=0.5), alpha=0.3,
-#'   beta=2, kappa=3, rho=0.2, delta=2, T, F, "exp")
+#' @examples \donttest{FullPL(times=1:10, values = seq(from=0.1, to=5, by=0.5), alpha=0.3,
+#'   beta=2, kappa=3, rho=0.2, delta=2, T, F, "exp")}
 #'
 #' @export
 FullPL <- function(times, values, alpha, beta, kappa, rho, delta, logscale=T, transformation=F, trawl.function="exp"){
@@ -771,7 +772,7 @@ FullPL <- function(times, values, alpha, beta, kappa, rho, delta, logscale=T, tr
 #'
 #' @return Pairwise Likelihood as per FullPL using a list of parameters instead.
 #' @examples ParamsListFullPL(c(1,2,3,4,5), c(0, 2.3, .3, 0, 5), delta=2,
-#'   params=list("alpha"=2,"beta"=3,"kappa"=1.5, "rho"=0.2), T, F)
+#'   params=list("alpha"=2,"beta"=3,"kappa"=1.5, "rho"=0.2), TRUE, FALSE)
 #'
 #' @export
 ParamsListFullPL <- function(times, values, delta, params, logscale=T, transformation=F){
@@ -809,9 +810,11 @@ ParamsListFullPL <- function(times, values, delta, params, logscale=T, transform
 #' values <- c(2,0,3,4,0)
 #' delta <- 2
 #' fixed_names <- c("alpha", "beta")
-#' params <- c(2.0, 3.4, 0.1, 4.3)
+#' fixed_params <- c(2.0, 3.4)
+#' params <- c(0.1, 4.3)
 #' model_vars_names <- c("alpha", "beta", "rho", "kappa")
-#' UnivariateFullPL(times, values, delta, fixed_names, params, model_vars_names, T, F)
+#' UnivariateFullPL(times, values, delta, fixed_names, fixed_params,
+#' params, model_vars_names, TRUE, FALSE)
 #'
 #' @export
 UnivariateFullPL <- function(times, values, delta, fixed_names, fixed_params, params, model_vars_names, logscale=T, transformation=F){
@@ -853,7 +856,7 @@ UnivariateFullPL <- function(times, values, delta, fixed_names, fixed_params, pa
 #' @param fixed_params Vector of numerical values of fixed parameters.
 #' @param params List of parameters.
 #' @param model_vars_names Vector of all parameters names in the model.
-#' @param logscale Boolean to use logscale (log-likelihood). Default \code{T}.
+#' @param logscale Logical; Default (\code{TRUE}) is to use logscale (log-likelihood).
 #' @param transformation Boolean to use the Marginal Transform (MT) method.
 #' @param n.moments Number of moments the transformed variables should have
 #'   using the Marginal Transform (MT) method.
@@ -867,7 +870,7 @@ UnivariateFullPL <- function(times, values, delta, fixed_names, fixed_params, pa
 #' params <- c(3.4, 0.1)
 #' fixed_params <- c(2.0, 4.3)
 #' model_vars_names <- c("alpha", "beta", "rho", "kappa")
-#' MarginalGPDLikelihood(values, fixed_names, fixed_params, params, model_vars_names, T, F)
+#' MarginalGPDLikelihood(values, fixed_names, fixed_params, params, model_vars_names)
 #'
 #' @export
 MarginalGPDLikelihood <- function(values, fixed_names, fixed_params, params, model_vars_names, logscale=T, transformation=F, n.moments=4){

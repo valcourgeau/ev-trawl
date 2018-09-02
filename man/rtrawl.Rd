@@ -54,11 +54,13 @@ Simulation of trawl process path using Slice partition.
 \examples{
 alpha <- 5
 beta <- 3
-times <- 1:15
+times <- 1:150
+rho <- 0.2
 trawl.function <- "exp"
-margi <- rgamma
+margi <- "gamma"
 kappa <- 0
-rtrawl(alpha = alpha, beta = beta, kappa = kappa, marginals = margi,
- trawl.function = trawl.function)
+n <- 1
+rtrawl(alpha = alpha, beta = beta, kappa = kappa, times = times, n = 1,
+marg.dist = margi, rho = rho, trawl.function = trawl.function)
 
 }

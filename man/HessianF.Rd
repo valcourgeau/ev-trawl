@@ -19,7 +19,3 @@ Hessian matrix of function \code{f} at parameters \code{params} with offset \cod
 \description{
 Computes Hessian matrix of a $C^2$ function given parameters and offset value epsilon
 }
-\examples{
-HessianF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 1e-6)
-HessianF(function(params){sum(params^3)}, params = c(2.5, 7), epsilon = 1e-6)
-}

@@ -19,7 +19,7 @@ MarginalGPDLikelihood(values, fixed_names, fixed_params, params,
 
 \item{model_vars_names}{Vector of all parameters names in the model.}
 
-\item{logscale}{Boolean to use logscale (log-likelihood). Default \code{T}.}
+\item{logscale}{Logical; Default (\code{TRUE}) is to use logscale (log-likelihood).}
 
 \item{transformation}{Boolean to use the Marginal Transform (MT) method.}
 
@@ -42,6 +42,6 @@ fixed_names <- c("alpha", "kappa")
 params <- c(3.4, 0.1)
 fixed_params <- c(2.0, 4.3)
 model_vars_names <- c("alpha", "beta", "rho", "kappa")
-MarginalGPDLikelihood(values, fixed_names, fixed_params, params, model_vars_names, T, F)
+MarginalGPDLikelihood(values, fixed_names, fixed_params, params, model_vars_names)
 
 }
