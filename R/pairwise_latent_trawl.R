@@ -108,8 +108,7 @@ ComputeBInterExp <- function(rho, t1, t2){
 #' @return GPD(alpha, beta+kappa)-distributed data from
 #' GPD(offset_shape, offset_scale)-distributed input data.
 #'
-#' @example
-#' TrfInverseG(c(0.1, 0.2), 2, 3, 2, 4, 1)
+#' @example TrfInverseG(c(0.1, 0.2), 2, 3, 2, 4, 1)
 TrfInverseG <- function(z, alpha, beta, kappa, offset_scale, offset_shape){
   # From GPD(alpha, beta+kappa) to GPD(offset_shape, offset_scale)
   if(beta <= 0) stop('beta should be positive.')
@@ -137,8 +136,7 @@ TrfInverseG <- function(z, alpha, beta, kappa, offset_scale, offset_shape){
 #' @return GPD(offset_shape, offset_scale)-distributed data from
 #' GPD(alpha, beta+kappa)-distributed data input data.
 #'
-#' @example
-#' TrfG(c(0.1, 0.2), 2, 3, 2, 4, 1)
+#' @example TrfG(c(0.1, 0.2), 2, 3, 2, 4, 1)
 TrfG <- function(x, alpha, beta, kappa, offset_scale, offset_shape){
   # From GPD(offset_shape, offset_scale) to GPD(alpha, beta+kappa)
   if(beta <= 0) stop('beta should be positive.')
@@ -160,8 +158,7 @@ TrfG <- function(x, alpha, beta, kappa, offset_scale, offset_shape){
 #'
 #' @return Transformed scale parameter given original data parameters.
 #'
-#' @example
-#' TrfFindOffsetScale(c(0.1, 0.2), 2, 3, 2, 4, 1)
+#' @example TrfFindOffsetScale(c(0.1, 0.2), 2, 3, 2, 4, 1)
 TrfFindOffsetScale <- function(alpha, beta, kappa, offset_shape){
   if(beta <= 0) stop('beta should be positive.')
   if(kappa <= 0) stop('kappa should be positive.')
@@ -217,8 +214,7 @@ plgpd <- function(x, alpha, beta, lower.tail=F){
 #' @param offset_shape Shape parameter of input data.
 #' @return Transformed scale parameter given original data parameters.
 #'
-#' @example
-#' TrfJacobian(c(0.1, 0.2), 2, 3, 2, 1, 4)
+#' @example TrfJacobian(c(0.1, 0.2), 2, 3, 2, 1, 4)
 TrfJacobian <- function(z, alpha, beta, kappa, offset_scale, offset_shape){
   # TODO check whether it is numerically stable by division of pdfs
   inv_g_z <- TrfInverseG(z = z, alpha = alpha, beta = beta, kappa = kappa, offset_scale = offset_scale, offset_shape = offset_shape)
@@ -622,7 +618,7 @@ PairwiseOneOne2 <- function(x1, x2, alpha, beta, kappa, B1, B2, B3){
 #'
 #' @return Latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0}
 #'   and \code{y > 0}.
-#' @example PairwiseOneOne(t1=1, x1=0.5, t2=4, x2=0.3, alpha=2, beta=3,
+#' @examples PairwiseOneOne(t1=1, x1=0.5, t2=4, x2=0.3, alpha=2, beta=3,
 #'   kappa=3.5, rho=0.2, T, 4)
 #'
 #' @export
@@ -722,7 +718,7 @@ SinglePairPL <- function(x1, x2, alpha, beta, kappa, B1, B2, B3, transformation=
 #' @param transformation Boolean to use the Marginal Transform (MT) method.
 #'
 #' @return Full latent trawl pairwise likelihood.
-#' @example FullPL(times=1:10, values = seq(from=0.1, to=5, by=0.5), alpha=0.3,
+#' @examples FullPL(times=1:10, values = seq(from=0.1, to=5, by=0.5), alpha=0.3,
 #'   beta=2, kappa=3, rho=0.2, delta=2, T, F, "exp")
 #'
 #' @export
@@ -784,7 +780,7 @@ FullPL <- function(times, values, alpha, beta, kappa, rho, delta, logscale=T, tr
 #' @param transformation Boolean to use the Marginal Transform (MT) method.
 #'
 #' @return Pairwise Likelihood as per FullPL using a list of parameters instead.
-#' @example ParamsListFullPL(c(1,2,3,4,5), c(0, 2.3, .3, 0, 5), delta=2,
+#' @examples ParamsListFullPL(c(1,2,3,4,5), c(0, 2.3, .3, 0, 5), delta=2,
 #'   params=list("alpha"=2,"beta"=3,"kappa"=1.5, "rho"=0.2), T, F)
 #'
 #' @export
@@ -819,7 +815,7 @@ ParamsListFullPL <- function(times, values, delta, params, logscale=T, transform
 #'
 #' @return FULL latent trawl pairwise likelihood with some (or none) parameters
 #'   fixed.
-#' @example times <- c(1,2,3,4,5) values <- c(2,0,3,4,0) delta <- 2 fixed_names
+#' @examples times <- c(1,2,3,4,5) values <- c(2,0,3,4,0) delta <- 2 fixed_names
 #' <- c("alpha", "beta") params <- c(2.0, 3.4, 0.1, 4.3) model_vars_names <-
 #' c("alpha", "beta", "rho", "kappa") UnivariateFullPL(times, values, delta,
 #' fixed_names, params, model_vars_names, T, F)
@@ -871,7 +867,7 @@ UnivariateFullPL <- function(times, values, delta, fixed_names, fixed_params, pa
 #'
 #' @return Generalised Pareto (log-)likelihood on non-zero exceedances under
 #'   independence.
-#' @example times <- c(1,2,3,4,5) values <- c(2,0,3,4,0) delta <- 2 fixed_names
+#' @examples times <- c(1,2,3,4,5) values <- c(2,0,3,4,0) delta <- 2 fixed_names
 #' <- c("alpha", "kappa") params <- c(2.0, 3.4, 0.1, 4.3) model_vars_names <-
 #' c("alpha", "beta", "rho", "kappa") UnivariateFullPL(times, values, delta,
 #' fixed_names, params, model_vars_names, T, F)
@@ -944,8 +940,10 @@ MarginalSimpleLik <- function(values, params){
 #' @return Parameters of Log-likelihood maximisation of GPD distribued variables (i.e. non-zero exceedances).
 #' @example MarginalSimpleLik(c(2.0, 0.3, 6.15, 0, 0.31), c(2.1, 1.17, 0.52, 4.17))
 GPDFit <- function(values, initial_guess, lower=c(0.1, 0.1), upper=c(20, 20)){
+  requireNamespace("stats", quietly = TRUE)
+
   fn_to_optim <- function(x){return(-MarginalSimpleLik(values = values, params = x))}
-  ff <- optim(fn_to_optim, par = initial_guess, method = "L-BFGS-B", lower = lower, upper = upper)
+  ff <- stats::optim(fn_to_optim, par = initial_guess, method = "L-BFGS-B", lower = lower, upper = upper)
   return(ff$par)
 }
 
@@ -956,7 +954,7 @@ GPDFit <- function(values, initial_guess, lower=c(0.1, 0.1), upper=c(20, 20)){
 #'
 #' @return Parameters given by a second-order method of moments as well as standard deviation across
 #' timeseries for each individual parameter.
-#' @example
+#' @examples
 #' exceed1 <- c(0.1, 0, 0.2, 0, 0, 0, 0.6, 1.5)
 #' exceed2 <- c(0, 0.3, 5.2, 0, 0, 3.0, 0, 2.2)
 #' val_array <- cbind(exceed1, exceed2)
@@ -964,6 +962,9 @@ GPDFit <- function(values, initial_guess, lower=c(0.1, 0.1), upper=c(20, 20)){
 MoMGPD <- function(values_array){
   # workds under the assumption that alpha > 2
   # values_array contains the time series with first axis as time and second as # of time series
+
+  requireNamespace("stats", quietly = T)
+
   n_dim <- length(values_array[1,])
   n_values <- length(values_array[,1])
   alphas_mom <- rep(0, n_dim)
@@ -971,7 +972,7 @@ MoMGPD <- function(values_array){
   kappas_mom <- rep(0, n_dim)
 
   for(index in 1:n_dim){
-    var_mom <- var(values_array[,index][values_array[,index]>0])
+    var_mom <- stats::var(values_array[,index][values_array[,index]>0])
     mean_mom <- mean(values_array[,index][values_array[,index]>0])
     p_mom <- length(values_array[,index][values_array[,index]>0])/n_values
 
@@ -984,6 +985,6 @@ MoMGPD <- function(values_array){
 
   return(list(alpha=alphas_mom, beta=betas_mom, kappa=kappas_mom,
               mean_alpha=mean(alphas_mom), mean_beta=mean(betas_mom), mean_kappa=mean(kappas_mom),
-              sd_alpha=sd(alphas_mom), sd_beta=sd(betas_mom), sd_kappa=sd(kappas_mom)))
+              sd_alpha=stats::sd(alphas_mom), sd_beta=stats::sd(betas_mom), sd_kappa=stats::sd(kappas_mom)))
 }
 

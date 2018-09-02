@@ -42,7 +42,23 @@ False (F).}
 \item{offset_shape}{Transformed-marginal Shape parameter.}
 
 \item{offset_scale}{Transformed-marginal Scale parameter.}
+
+\item{deep_cols}{Depth of reconstruction (columns). Default is 30.}
+}
+\value{
+Simulated path (size the same as times) of trawl process.
 }
 \description{
 Simulation of trawl process path using Slice partition.
+}
+\examples{
+alpha <- 5
+beta <- 3
+times <- 1:15
+trawl.function <- "exp"
+margi <- rgamma
+kappa <- 0
+rtrawl(alpha = alpha, beta = beta, kappa = kappa, marginals = margi,
+ trawl.function = trawl.function)
+
 }

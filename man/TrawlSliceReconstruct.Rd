@@ -36,3 +36,9 @@ Samples using trawl slice reconstruction disributed using
 Performs trawl slices reconstuction to get gamma samples using the
 independent measure scaterring.
 }
+\examples{
+fcts <- lapply(c(1,2,3,4), function(t) TrawlExp(t, rho=0.2)) prims
+  <- lapply(c(1,2,3,4), function(t) TrawlExpPrimitive(t, rho=0.2))
+  TrawlSliceReconstruct(alpha=3, beta=2, times=c(0, 1, 2, 3), marg.dist =
+  "gamma", n=1, fcts, prims)
+}

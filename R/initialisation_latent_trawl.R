@@ -1,4 +1,3 @@
-
 #' Zeta function from auto-correlation expansion for small lags.
 #'
 #' @param alpha Shape parameter.
@@ -21,14 +20,15 @@ Zeta <- function(alpha, beta, kappa){
 #' @param cluster.size Lag at which ACF is negligeable i.e. cluster size.
 #' @param data Exceedane timeseries to be used.
 #'
-#' @example
+#' @examples
 #' # TODO ADD data
 #' GetEstimateRho(alpha = 5, beta = 2, kappa = 3, cluster.size = 8, data = NA)
 #'
 #' @export
 GetEstimateRho <- function(alpha, beta, kappa, cluster.size, data){
+  requireNamespace("stats", quietly = TRUE)
   if(alpha < 0){
-    data[data>0] <- vapply(data[data>0], function(x){trf_inv_g(x, alpha = alpha,
+    data[data>0] <- vapply(data[data>0], function(x){TrfInverseG(x, alpha = alpha,
                                                                beta = beta, kappa = kappa,
                                                                offset_scale = 2,
                                                                offset_shape = 1+kappa)}, FUN.VALUE = 1.0)
@@ -40,7 +40,7 @@ GetEstimateRho <- function(alpha, beta, kappa, cluster.size, data){
   d_plus <- d_plus * (log(1+2*kappa/beta) + (2*alpha-3)/((alpha-2)*(alpha-1)))
 
   d_times <- 2*beta/((alpha-2)*(alpha-1))*(beta*(1+2*kappa/beta)^{2-alpha}*log(1+kappa/beta)+Zeta(alpha = alpha-1, beta = beta, kappa = kappa))
-  return( abs(var(data) / (cluster.size * alpha * (d_plus-d_times))))
+  return( abs(stats::var(data) / (cluster.size * alpha * (d_plus-d_times))))
 }
 
 #' Computes initial guess for Univariate Latent-Trawl model.
@@ -49,13 +49,14 @@ GetEstimateRho <- function(alpha, beta, kappa, cluster.size, data){
 #' @param data Exceedane timeseries to be used.
 #' @param cluster.size Lag at which ACF is negligeable.
 #'
-#' @example
+#' @examples
 #' # TODO ADD data
 #' GenerateParameters(data = NA, cluster.size = 8)
 #'
 #' @export
 generate_parameters <- function(data, cluster.size){
   requireNamespace("fExtremes", quietly = TRUE)
+  requireNamespace("stats", quietly = TRUE)
 
   params_to_work_with <- rep(0, 4)
   fit_marginal <-  fExtremes::gpdFit(data[data > 0], u= 0)@fit$fit$par
@@ -77,7 +78,7 @@ generate_parameters <- function(data, cluster.size){
   if(is.na(params_to_work_with[3])){
     # if rho is not a valid number, uses random initialisation.
     warning("rho initial value is not valid.")
-    params_to_work_with[3] <- runif(min = 1e-6, max = 1, n = 1)
+    params_to_work_with[3] <- stats::runif(min = 1e-6, max = 1, n = 1)
   }
   return(params_to_work_with)
 }

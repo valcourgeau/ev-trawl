@@ -32,3 +32,8 @@ Latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0}
 Computes latent trawl pairwise likelihood with \code{(x,x)} where
 \code{x > 0} and \code{y > 0} with exponential trawl function.
 }
+\examples{
+PairwiseOneOne(t1=1, x1=0.5, t2=4, x2=0.3, alpha=2, beta=3,
+  kappa=3.5, rho=0.2, T, 4)
+
+}

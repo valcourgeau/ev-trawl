@@ -84,6 +84,7 @@ test_that("TrfG and TrfInverseG are the inverse of one another", {
 
 
 test_that("TrfG correctly transforms data w.r.t shape parameter", {
+  requireNamespace("evir", quietly = T)
   set.seed(42)
 
   alpha <- 3
@@ -95,7 +96,7 @@ test_that("TrfG correctly transforms data w.r.t shape parameter", {
 
   n.sample <- 10000
 
-  test.samples <- rgpd(n = n.sample, xi = 1/offset_shape, beta = offset_scale)
+  test.samples <- evir::rgpd(n = n.sample, xi = 1/offset_shape, beta = offset_scale)
   trf.samples <- TrfG(test.samples, alpha=alpha, beta=beta, kappa=kappa,
                              offset_scale=offset_scale, offset_shape=offset_shape)
 
@@ -110,6 +111,7 @@ test_that("TrfG correctly transforms data w.r.t shape parameter", {
 
 
 test_that("TrfInverseG correctly transforms data w.r.t shape parameter", {
+  requireNamespace("evir", quietly = T)
   set.seed(42)
 
   # testing with alpha > 0
@@ -122,7 +124,7 @@ test_that("TrfInverseG correctly transforms data w.r.t shape parameter", {
 
   n.sample <- 10000
 
-  test.samples <- rgpd(n = n.sample, xi = 1/alpha, beta = beta+kappa)
+  test.samples <- evir::rgpd(n = n.sample, xi = 1/alpha, beta = beta+kappa)
   trf.samples <- TrfInverseG(test.samples, alpha=alpha, beta=beta, kappa=kappa,
                              offset_scale=offset_scale, offset_shape=offset_shape)
 
@@ -141,7 +143,7 @@ test_that("TrfInverseG correctly transforms data w.r.t shape parameter", {
   alpha <- -3
   n.sample <- 5000
 
-  test.samples <- rgpd(n = n.sample, xi = 1/alpha, beta = beta+kappa)
+  test.samples <- evir::rgpd(n = n.sample, xi = 1/alpha, beta = beta+kappa)
   trf.samples <- TrfInverseG(test.samples, alpha=alpha, beta=beta, kappa=kappa,
                              offset_scale=offset_scale, offset_shape=offset_shape)
   trf.samples <- trf.samples[!is.nan(trf.samples)]

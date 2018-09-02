@@ -16,6 +16,11 @@ TrawlExp(t, rho, max_value = 1, min_value = 0.01)
 \item{min_value}{Minimal value accepted for the trawl function. Default is
 1e-2.}
 }
+\value{
+(Vectorised) Exponential trawl function with peak time t and
+  parameter rho. If this function is evaluated using NA, it yields a list of
+  key components (rho, max time difference, total area of trawl set A).
+}
 \description{
 Returns an exponential trawl function with base time t.
 }

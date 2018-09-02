@@ -29,6 +29,8 @@ inverse gaussian.}
 \item{transformation}{Boolean to apply marginal transform method. Default is
 False (F).}
 
+\item{trawl.function}{Type of trawl function that should be used. Default NA.}
+
 \item{trawl_fs}{collection of trawl functions indexed on \code{times}.}
 
 \item{trawl_fs_prim}{collection of trawl functions primitives indexed on
@@ -37,6 +39,10 @@ False (F).}
 \item{n_moments}{Number of finite moments for transformed marginals.}
 
 \item{deep_cols}{Depth of reconstruction (columns). Default is 30.}
+}
+\value{
+Simulated path (size the same as times) of latent-trawl extreme
+  value process.
 }
 \description{
 Simulation of extreme value path using latent trawl process. Transformed

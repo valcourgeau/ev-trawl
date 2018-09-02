@@ -14,6 +14,11 @@ TrawlExpPrimitive(t, rho, zero_at = -Inf)
 
 \item{zero_at}{Value at which primitive is zero. Default is \code{-Inf}.}
 }
+\value{
+(Vectorised) Primitive of Exponential trawl function with peak time
+  t and parameter rho. If this function is evaluated using NA, it yields a
+  list of key components such as the trawl peak time t.
+}
 \description{
 Returns a primitive of exponential trawl function with base time t. Such
 primitive has its zero at \code{zero_at}.

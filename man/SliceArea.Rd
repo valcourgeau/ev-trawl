@@ -17,7 +17,15 @@ partionned.}
 
 \item{trawl_f_prim}{Trawl function primitive.}
 }
+\value{
+Area of slice \code{S(i,j)} in Slice Partition method for trawl
+  functions.
+}
 \description{
 Computes the area of a slice for the Slice Partition method of trawl
 functions.
+}
+\examples{
+SliceArea(1, 2, times=c(0, 1, 2, 3), TrawlExpPrimitive(t=2,
+  rho=0.2))
 }

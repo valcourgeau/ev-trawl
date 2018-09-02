@@ -18,6 +18,10 @@ at.}
 
 \item{prim}{Boolean to use primitive or not. Default is False (F).}
 }
+\value{
+Collection of trawl functions set on \code{times} given the type of
+  trawl (\code{type}).
+}
 \description{
 Creates a list of trawl functions  given a type of trawl and a vector of
 times as peak times. Has the option to get primitives. Note that only

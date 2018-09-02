@@ -36,3 +36,8 @@ Full latent trawl pairwise likelihood.
 Computes latent trawl FULL pairwise likelihood depending with exponential
 trawl function.
 }
+\examples{
+FullPL(times=1:10, values = seq(from=0.1, to=5, by=0.5), alpha=0.3,
+  beta=2, kappa=3, rho=0.2, delta=2, T, F, "exp")
+
+}
