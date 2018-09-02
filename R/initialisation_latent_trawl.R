@@ -3,10 +3,9 @@
 #' @param alpha Shape parameter.
 #' @param beta Scale parameter. Must be positive.
 #' @param kappa Exceedance probability parameter. Must be positive.
-#'
-#' @example Zeta(alpha = 5, beta = 4, kappa = 3)
+#' @examples Zeta(alpha = 5, beta = 4, kappa = 3)
+#' @export
 Zeta <- function(alpha, beta, kappa){
-  requireNamespace("hypergeo", quietly = TRUE)
   res.zeta <- beta^alpha / ((beta+kappa)^{alpha-1})
   res.zeta <- res.zeta * hypergeo::hypergeo(A = alpha-1, B = alpha-1, C = alpha, z = - beta/(beta+kappa))
   return(Re(res.zeta))
@@ -44,17 +43,18 @@ GetEstimateRho <- function(alpha, beta, kappa, cluster.size, data){
 }
 
 #' Computes initial guess for Univariate Latent-Trawl model.
-#' Uses \cdoe{fExtreme} package method \code{gpdFit} to fit MLE.
+#' Uses \code{fExtreme} package method \code{gpdFit} to fit MLE.
 #'
 #' @param data Exceedane timeseries to be used.
 #' @param cluster.size Lag at which ACF is negligeable.
 #'
 #' @examples
 #' # TODO ADD data
-#' GenerateParameters(data = NA, cluster.size = 8)
+#' data(hourlyhourly_bloomsbury_air_pollution_2000_2017)
+#' GenerateParameters(data = hourly_bloomsbury_air_pollution_2000_2017$O3[1:1000], cluster.size = 8)
 #'
 #' @export
-generate_parameters <- function(data, cluster.size){
+GenerateParameters <- function(data, cluster.size){
   requireNamespace("fExtremes", quietly = TRUE)
   requireNamespace("stats", quietly = TRUE)
 

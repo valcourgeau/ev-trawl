@@ -279,7 +279,7 @@ test_that("Single PL term", {
                       beta = beta, kappa = kappa, B1 = B1, B2 = B2, B3 = B3, transformation = F)
   answer <- PairwiseOneZero(x1 = x1, alpha = alpha,
                                beta = beta, kappa = kappa, B1 = B1, B2 = B2, B3 = B3, transformation = F,
-                               n_moments = 0)
+                               n.moments = 0)
   expect_equal(val, answer)
 
   # 1-1
@@ -289,7 +289,7 @@ test_that("Single PL term", {
                       beta = beta, kappa = kappa, B1 = B1, B2 = B2, B3 = B3, transformation = F)
   answer <- PairwiseOneOne(x1 = x1, x2 = x2, alpha = alpha,
                                beta = beta, kappa = kappa, B1 = B1, B2 = B2, B3 = B3, transformation = F,
-                               n_moments = 0)
+                               n.moments = 0)
   expect_equal(val, answer)
 })
 
@@ -323,7 +323,7 @@ test_that("Single PL term with transformation", {
   answer <- PairwiseOneZero( x1 = x1,  alpha = alpha,
                                beta = beta, kappa = kappa, B1 = B1, B2 = B2, B3 = B3,
                              transformation = T,
-                               n_moments = 0)
+                               n.moments = 0)
   expect_equal(val, answer)
 
   # 1-1
@@ -333,7 +333,7 @@ test_that("Single PL term with transformation", {
                       beta = beta, kappa = kappa, transformation = T, n.moments = 0)
   answer <- PairwiseOneOne( x1 = x1,  x2 = x2, alpha = alpha,  B1 = B1, B2 = B2, B3 = B3,
                            beta = beta, kappa = kappa, transformation = T,
-                           n_moments = 0)
+                           n.moments = 0)
   expect_equal(val, answer)
 })
 

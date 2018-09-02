@@ -20,6 +20,10 @@ PairwiseZeroZero(alpha, beta, kappa, B1, B2, B3, transformation = F,
 \item{B2}{Intersection area between times \code{t1} and \code{t2}.}
 
 \item{B3}{Difference area between times \code{t2} and \code{t1}.}
+
+\item{transformation}{Boolean to use the Marginal Transform (MT) method.}
+
+\item{n.moments}{Number of moments achieved by transformed GPD marginals, if used.}
 }
 \value{
 Second part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.
@@ -27,4 +31,8 @@ Second part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.
 \description{
 Computes latent trawl pairwise likelihood with \code{(x,y) = (0,0)} for Exponential
 Trawl funciton.
+}
+\examples{
+PairwiseZeroZero(alpha = 3.2, beta = 2, kappa = 3, B1=0.3, B2=0.7, B3=0.3)
+
 }

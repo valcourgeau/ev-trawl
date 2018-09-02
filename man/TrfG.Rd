@@ -8,6 +8,8 @@ That is from GPD(alpha, beta+kappa) to GPD(offset_shape, offset_scale).}
 TrfG(x, alpha, beta, kappa, offset_scale, offset_shape)
 }
 \arguments{
+\item{x}{Data distributed as GPD(offset_shape, offset_scale).}
+
 \item{alpha}{Shape parameter of output data.}
 
 \item{beta}{Part of scale parameter of output data (beta + kappa).
@@ -20,8 +22,6 @@ Should be positive.}
 Should be positive.}
 
 \item{offset_shape}{Shape parameter of input data.}
-
-\item{z}{Data distributed as GPD(offset_shape, offset_scale).}
 }
 \value{
 GPD(offset_shape, offset_scale)-distributed data from

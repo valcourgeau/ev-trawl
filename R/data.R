@@ -6,6 +6,8 @@
 #' Courtesy of King's College Air Pollution monitoring network. Values expressed
 #' in micrograms per cubic meter.
 #'
+#' @docType data
+#' @usage data(hourly_bloomsbury_air_pollution_2000_2017)
 #' @format A data frame with 157710 rows and 9 variables: \describe{
 #'   \item{index}{index of entry}{date of entry in format
 #'   dd/mm/yyyy}
@@ -17,6 +19,10 @@
 #'   Dioxyde, in mu g / m^3} \item{PM10}{concentration in particulate matter 10
 #'   micrometers or less in diameter, in mu g / m^3}
 #'   \item{SO2}{concentration in
-#'   Sulfur Dioxide, in mu g / m^3}
+#'   Sulfur Dioxide, in mu g / m^3}}
 #' @source \url{https://www.londonair.org.uk/} data selection tool.
+#' @keywords datasets
+#' @examples
+#' data(hourly_bloomsbury_air_pollution_2000_2017)
+#' \donttest{plot(hourly_bloomsbury_air_pollution_2000_2017$O3)}
 "hourly_bloomsbury_air_pollution_2000_2017"

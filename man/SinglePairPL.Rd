@@ -19,6 +19,12 @@ SinglePairPL(x1, x2, alpha, beta, kappa, B1, B2, B3, transformation = F,
 
 \item{kappa}{Exceedance probability parameter. Should be positive.}
 
+\item{B1}{Difference area between \code{t1} and \code{t2} (in this order).}
+
+\item{B2}{Intersection area between \code{t1} and \code{t2} (in this order).}
+
+\item{B3}{Difference area between \code{t2} and \code{t1} (in this order).}
+
 \item{transformation}{Boolean to use the Marginal Transform (MT) method.}
 
 \item{n.moments}{Number of finite moments for transformed marginals.}

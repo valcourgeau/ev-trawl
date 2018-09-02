@@ -2,10 +2,10 @@
 % Please edit documentation in R/pairwise_latent_trawl.R
 \name{plgpd}
 \alias{plgpd}
-\title{Computes the cumulative distribution function of Generalised Pareto Distribution at x,
-with shape parameter alpha and scale parameter beta.}
+\title{Computes the cumulative distribution function of Generalised Pareto
+Distribution at x, with shape parameter alpha and scale parameter beta.}
 \usage{
-plgpd(x, alpha, beta, lower.tail = F)
+plgpd(x, alpha, beta, lower.tail = T)
 }
 \arguments{
 \item{x}{value at which the pdf is evaluated.}
@@ -13,11 +13,19 @@ plgpd(x, alpha, beta, lower.tail = F)
 \item{alpha}{Shape parameter.}
 
 \item{beta}{Scale parameter, should be positive.}
+
+\item{lower.tail}{logical; if TRUE (default), probabilities are \code{P[X ≤
+x]} otherwise, \code{P[X > x]}.}
 }
 \value{
-GPD CDF function evaluated at x with shape and scale parameters respectively alpha and beta.
+GPD CDF function evaluated at x with shape and scale parameters
+  respectively alpha and beta.
 }
 \description{
-Computes the cumulative distribution function of Generalised Pareto Distribution at x,
-with shape parameter alpha and scale parameter beta.
+Computes the cumulative distribution function of Generalised Pareto
+Distribution at x, with shape parameter alpha and scale parameter beta.
+}
+\examples{
+plgpd(2.34, alpha = 1, beta = 2)
+
 }

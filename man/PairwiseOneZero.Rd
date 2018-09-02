@@ -6,7 +6,7 @@
 with exponential trawl function.}
 \usage{
 PairwiseOneZero(x1, alpha, beta, kappa, B1, B2, B3, transformation = F,
-  n_moments = 4)
+  n.moments = 4)
 }
 \arguments{
 \item{x1}{Positive value corresponding to \code{t1}.}
@@ -25,7 +25,7 @@ PairwiseOneZero(x1, alpha, beta, kappa, B1, B2, B3, transformation = F,
 
 \item{transformation}{Boolean to use the Marginal Transform (MT) method.}
 
-\item{n_moments}{Number of moments achieved by transformed GPD marginals, if used.}
+\item{n.moments}{Number of moments achieved by transformed GPD marginals, if used.}
 }
 \value{
 Second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}
@@ -34,4 +34,8 @@ with exponential trawl function.
 \description{
 Computes term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}
 with exponential trawl function.
+}
+\examples{
+PairwiseOneZero(x1=0.5, alpha=0.3, beta=2, kappa=3, B1=0.3, B2=0.7, B3=0.3)
+
 }

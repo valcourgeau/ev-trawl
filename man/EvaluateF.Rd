@@ -19,7 +19,3 @@ Evaluate of function \code{f} at parameters \code{params} with offset \code{epsi
 \description{
 Evalutae function at given parameters.
 }
-\examples{
-EvaluateF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 0)
-EvaluateF(function(params){sum(params)}, params = c(2.5, 7), epsilon = 1)
-}

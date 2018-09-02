@@ -14,19 +14,19 @@ SecondOrderMixedDiffVal(value.c, value.x.p, value.x.m, value.y.p,
 
 \item{value.x.m}{function value at \code{(x-epsilon,y)}.}
 
+\item{value.y.p}{function value at \code{(x,y+epsilon)}.}
+
+\item{value.y.m}{function value at \code{(x,y-epsilon)}.}
+
+\item{value.xy.p}{function value at \code{(x+epsilon,y+epsilon)}.}
+
+\item{value.xy.m}{function value at \code{(x-epsilon,y-epsilon)}.}
+
 \item{epsilon}{offset value for both \code{x} and \code{y}.}
-
-\item{value.x.p}{function value at \code{(x,y+epsilonx)}.}
-
-\item{value.x.m}{function value at \code{(x,y-epsilon)}.}
 }
 \value{
 \code{(value.p -2*value.c + value.m) / (2*epsilon)}.
 }
 \description{
 Second-order bivariate differentiation calculation.
-}
-\examples{
-SecondOrderMixedDiffVal(4, 3, 2, 3.5, 3, 2, 2.12, 1e-6)
-SecondOrderMixedDiffVal(4.52, 3.14, 2, 3.5, 3.175, 2.527, 2.51, 1e-1)
 }

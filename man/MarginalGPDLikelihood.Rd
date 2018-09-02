@@ -6,7 +6,7 @@
 independence.}
 \usage{
 MarginalGPDLikelihood(values, fixed_names, fixed_params, params,
-  model_vars_names, logscale = T, transformation = F, n_moments = 4)
+  model_vars_names, logscale = T, transformation = F, n.moments = 4)
 }
 \arguments{
 \item{values}{Vector of target values.}
@@ -23,7 +23,7 @@ MarginalGPDLikelihood(values, fixed_names, fixed_params, params,
 
 \item{transformation}{Boolean to use the Marginal Transform (MT) method.}
 
-\item{n_moments}{Number of moments the transformed variables should have
+\item{n.moments}{Number of moments the transformed variables should have
 using the Marginal Transform (MT) method.}
 }
 \value{
@@ -35,8 +35,13 @@ Computes Generalised Pareto (log-)likelihood on non-zero exceedances under
 independence.
 }
 \examples{
-times <- c(1,2,3,4,5) values <- c(2,0,3,4,0) delta <- 2 fixed_names
-<- c("alpha", "kappa") params <- c(2.0, 3.4, 0.1, 4.3) model_vars_names <-
-c("alpha", "beta", "rho", "kappa") UnivariateFullPL(times, values, delta,
-fixed_names, params, model_vars_names, T, F)
+times <- c(1,2,3,4,5)
+values <- c(2,0,3,4,0)
+delta <- 2
+fixed_names <- c("alpha", "kappa")
+params <- c(3.4, 0.1)
+fixed_params <- c(2.0, 4.3)
+model_vars_names <- c("alpha", "beta", "rho", "kappa")
+MarginalGPDLikelihood(values, fixed_names, fixed_params, params, model_vars_names, T, F)
+
 }

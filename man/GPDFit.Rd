@@ -2,22 +2,32 @@
 % Please edit documentation in R/pairwise_latent_trawl.R
 \name{GPDFit}
 \alias{GPDFit}
-\title{Generalised Pareto likelihood maximisation using L-BFGS-B optimisation routine.}
+\title{Generalised Pareto likelihood maximisation using L-BFGS-B optimisation
+routine.}
 \usage{
 GPDFit(values, initial_guess, lower = c(0.1, 0.1), upper = c(20, 20))
 }
 \arguments{
 \item{values}{Exceedance values.}
 
-\item{initial_guess}{(at least 2-d) Vector for GPD parameters starting values.}
+\item{initial_guess}{(at least 2-d) Vector for GPD parameters starting
+values.}
 
-\item{lower}{Vector of lower bounds limits for optimisation procedure. Default \code{c(0.1, 0.1)}.}
+\item{lower}{Vector of lower bounds limits for optimisation procedure.
+Default \code{c(0.1, 0.1)}.}
 
-\item{upper}{Vector of upper bounds limits for optimisation procedure. Default \code{c(20, 20)}.}
+\item{upper}{Vector of upper bounds limits for optimisation procedure.
+Default \code{c(20, 20)}.}
 }
 \value{
-Parameters of Log-likelihood maximisation of GPD distribued variables (i.e. non-zero exceedances).
+Parameters of Log-likelihood maximisation of GPD distribued variables
+  (i.e. non-zero exceedances).
 }
 \description{
-Generalised Pareto likelihood maximisation using L-BFGS-B optimisation routine.
+Generalised Pareto likelihood maximisation using L-BFGS-B optimisation
+routine.
+}
+\examples{
+GPDFit(c(2.0, 0.3, 6.15, 0, 0.31), c(2.1, 1.17, 0.52, 4.17))
+
 }

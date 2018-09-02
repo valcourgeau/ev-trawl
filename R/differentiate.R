@@ -5,12 +5,7 @@
 #' @param epsilon offset value for \code{x}.
 #'
 #' @return \code{(value.p - value.m) / (2*epsilon)}.
-#' @examples
-#' DiffVal(4, 2, 1)
-#' DiffVal(2.5, 2, 2)
 DiffVal <- function(value.p, value.m, epsilon){
-  # n
-
   return((value.p-value.m)/(2*epsilon))
 }
 
@@ -22,9 +17,6 @@ DiffVal <- function(value.p, value.m, epsilon){
 #' @param epsilon offset value for \code{x}.
 #'
 #' @return \code{(value.p -2*value.c + value.m) / (2*epsilon)}.
-#' @examples
-#' SecondOrderDiffVal(4, 3, 2, 1e-6)
-#' SecondOrderDiffVal(2.5, 5, 2, 1e-6)
 SecondOrderDiffVal <- function(value.p, value.c, value.m, epsilon){
   temp <- value.p + value.m
   temp <- temp - 2.0*value.c
@@ -37,14 +29,13 @@ SecondOrderDiffVal <- function(value.p, value.c, value.m, epsilon){
 #' @param value.c function value at \code{(x,y)}.
 #' @param value.x.p function value at \code{(x+epsilonx,y)}.
 #' @param value.x.m function value at \code{(x-epsilon,y)}.
-#' @param value.x.p function value at \code{(x,y+epsilonx)}.
-#' @param value.x.m function value at \code{(x,y-epsilon)}.
+#' @param value.y.p function value at \code{(x,y+epsilon)}.
+#' @param value.y.m function value at \code{(x,y-epsilon)}.
+#' @param value.xy.p function value at \code{(x+epsilon,y+epsilon)}.
+#' @param value.xy.m function value at \code{(x-epsilon,y-epsilon)}.
 #' @param epsilon offset value for both \code{x} and \code{y}.
 #'
 #' @return \code{(value.p -2*value.c + value.m) / (2*epsilon)}.
-#' @examples
-#' SecondOrderMixedDiffVal(4, 3, 2, 3.5, 3, 2, 2.12, 1e-6)
-#' SecondOrderMixedDiffVal(4.52, 3.14, 2, 3.5, 3.175, 2.527, 2.51, 1e-1)
 SecondOrderMixedDiffVal <- function(value.c,
                              value.x.p, value.x.m,
                              value.y.p, value.y.m,
@@ -63,10 +54,6 @@ SecondOrderMixedDiffVal <- function(value.c,
 #' @param epsilon Offset value for all components.
 #'
 #' @return Gradient of function \code{f} at parameters \code{params} with offset \code{epsilon}.
-#'
-#' @examples
-#' GradF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 1e-6)
-#' GradF(function(params){sum(params)}, params = c(2.5, 7), epsilon = 1e-6)
 GradF <- function(f,
                    params,
                    epsilon=1e-6){
@@ -97,10 +84,6 @@ GradF <- function(f,
 #' @param epsilon Offset value to add to all component of \code{params}.
 #'
 #' @return Evaluate of function \code{f} at parameters \code{params} with offset \code{epsilon}.
-#'
-#' @examples
-#' EvaluateF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 0)
-#' EvaluateF(function(params){sum(params)}, params = c(2.5, 7), epsilon = 1)
 EvaluateF <- function(f,
                        params,
                        epsilon){

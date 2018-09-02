@@ -266,7 +266,7 @@ test_that("rlrawl using trawl.function", {
 
 
 test_that("rlexceed GPD test", {
-  requireNamespace("eva", quietly = T)
+ requireNamespace("eva", quietly = T)
  alpha <- 3
  beta <- 6
  kappa <- 5

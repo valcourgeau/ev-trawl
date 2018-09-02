@@ -15,9 +15,9 @@ PairwiseOneZero24(x1, alpha, beta, kappa, B1, trawlA)
 
 \item{kappa}{Exceedance probability parameter. Should be positive.}
 
-\item{trawlA}{Total trawl set measure / area under trawl function.}
+\item{B1}{Difference area between \code{t1} and \code{t2} (in this order).}
 
-\item{B3}{Difference area between \code{t1} and \code{t2} (in this order).}
+\item{trawlA}{Total trawl set measure / area under trawl function.}
 }
 \value{
 Partial part of second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}.

@@ -28,6 +28,8 @@ natural integer.}
 \item{logscale}{Boolean to use logscale (log-likelihood). Default \code{T}.}
 
 \item{transformation}{Boolean to use the Marginal Transform (MT) method.}
+
+\item{trawl.function}{Type of trawl function that should be used. Default NA.}
 }
 \value{
 Full latent trawl pairwise likelihood.

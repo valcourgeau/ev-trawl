@@ -21,3 +21,7 @@ GPD pdf function evaluated at x with shape and scale parameters respectively alp
 Computes the probability density function of Generalised Pareto Distribution at x,
 with shape parameter alpha and scale parameter beta.
 }
+\examples{
+dlgpd(2.34, alpha = 1, beta = 2)
+
+}

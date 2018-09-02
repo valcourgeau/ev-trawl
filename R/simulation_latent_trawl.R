@@ -7,8 +7,6 @@
 #' @param n Sample size.
 #'
 #' @return n Gamma(alpha*dx*dy, beta) samples.
-#' @example GammaBox(2.0, 3.0, 0.5, 0.5, 10)
-#' @importFrom stats rgamma
 GammaBox <- function(alpha, beta, dx, dy, n){
   requireNamespace("stats", quietly = T)
   alpha <- abs(alpha)
@@ -24,7 +22,6 @@ GammaBox <- function(alpha, beta, dx, dy, n){
 #' @param n Sample size.
 #'
 #' @return n Gamma(alpha*dt*dt, beta) samples.
-#' @example GammaSqBox(2.0, 3.0, 0.5, 10)
 GammaSqBox <- function(alpha, beta, dt, n){
   return(GammaBox(alpha = alpha, beta = beta, dx = dt, dy = dt, n = n))
 }
@@ -40,7 +37,6 @@ GammaSqBox <- function(alpha, beta, dt, n){
 #' @return (Vectorised) Exponential trawl function with peak time t and
 #'   parameter rho. If this function is evaluated using NA, it yields a list of
 #'   key components (rho, max time difference, total area of trawl set A).
-#' @example TrawlExp(t=1, rho=1) f(0) # returns e^{-1}
 TrawlExp <- function(t, rho, max_value=1, min_value=1e-2){
   if(rho <= 0) stop('rho should be positive.')
   time_eta <- -log(min_value)/rho
@@ -70,7 +66,6 @@ TrawlExp <- function(t, rho, max_value=1, min_value=1e-2){
 #' @return (Vectorised) Primitive of Exponential trawl function with peak time
 #'   t and parameter rho. If this function is evaluated using NA, it yields a
 #'   list of key components such as the trawl peak time t.
-#' @example TrawlExpPrimitive(t=1, rho=2) F(0) # returns e^{-2}/2
 TrawlExpPrimitive <- function(t, rho, zero_at=-Inf){
   # primitive of exponential trawl function which is zero at zero_at
   if(rho <= 0) stop('rho should be positive.')
@@ -98,7 +93,6 @@ TrawlExpPrimitive <- function(t, rho, zero_at=-Inf){
 #'
 #' @return Collection of trawl functions set on \code{times} given the type of
 #'   trawl (\code{type}).
-#' @example CollectionTrawl(times = 1:5, list("rho"=0.4), type="exp")
 CollectionTrawl <- function(times, params, type, prim=F){
   if(!is.list(params)) stop('params should be a list.')
   # TODO Add more than exp
@@ -128,8 +122,6 @@ CollectionTrawl <- function(times, params, type, prim=F){
 #'
 #' @return Area of slice \code{S(i,j)} in Slice Partition method for trawl
 #'   functions.
-#' @examples SliceArea(1, 2, times=c(0, 1, 2, 3), TrawlExpPrimitive(t=2,
-#'   rho=0.2))
 SliceArea <- function(i, j, times, trawl.f.prim){
   prim_info <- trawl.f.prim(NA)
   origin_time <- prim_info$trawl_time
@@ -168,19 +160,14 @@ SliceArea <- function(i, j, times, trawl.f.prim){
 #' @param trawl.fs.prim collection of trawl functions primitives indexed on
 #'   \code{times}.
 #' @param deep_cols Depth of reconstruction (columns). Default is 30.
+#' @param ghyp.object Object from \code{ghyp} package when using GH or GIG distributions.
 #'
 #' @return Samples using trawl slice reconstruction disributed using
 #'   \code{marginal}.
-#' @examples fcts <- lapply(c(1,2,3,4), function(t) TrawlExp(t, rho=0.2)) prims
-#'   <- lapply(c(1,2,3,4), function(t) TrawlExpPrimitive(t, rho=0.2))
-#'   TrawlSliceReconstruct(alpha=3, beta=2, times=c(0, 1, 2, 3), marg.dist =
-#'   "gamma", n=1, fcts, prims)
-#'   @importFrom ghyp ghyp
-#'   @importFrom stats rgamma rnorm
 TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl.fs, trawl.fs.prim, deep_cols=30, ghyp.object=NA){
   # TODO Add GIG compatibility
   # TODO sort the trawl.fs and trawl.fs.prim as the times
-  requireNamespace("ghyp", quietly = TRUE)
+  #requireNamespace("ghyp", quietly = TRUE)
   requireNamespace("stats", quietly = TRUE)
 
   if(n > 1) stop("Case n>1 not yet implemented.")
@@ -361,7 +348,6 @@ rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl.fs=NA
 #'          marg.dist = marg.dist, n = n, transformation = transformation,
 #'          trawl.function= trawl.function)
 #'
-#' @importFrom stats runif rexp
 #' @export
 rlexceed <- function(alpha, beta, kappa, rho=NA, times, marg.dist, n, transformation,
                      trawl.function=NA, trawl.fs=NA, trawl.fs.prim=NA, n_moments = 4, deep_cols=30){

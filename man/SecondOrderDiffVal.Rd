@@ -21,7 +21,3 @@ SecondOrderDiffVal(value.p, value.c, value.m, epsilon)
 \description{
 Second-order centered differentiation calculation.
 }
-\examples{
-SecondOrderDiffVal(4, 3, 2, 1e-6)
-SecondOrderDiffVal(2.5, 5, 2, 1e-6)
-}

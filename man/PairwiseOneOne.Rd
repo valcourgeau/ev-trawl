@@ -6,7 +6,7 @@
 \code{x > 0} and \code{y > 0} with exponential trawl function.}
 \usage{
 PairwiseOneOne(x1, x2, alpha, beta, kappa, B1, B2, B3,
-  transformation = F, n_moments = 4)
+  transformation = F, n.moments = 4)
 }
 \arguments{
 \item{x1}{Positive value corresponding to \code{t1}.}
@@ -19,9 +19,15 @@ PairwiseOneOne(x1, x2, alpha, beta, kappa, B1, B2, B3,
 
 \item{kappa}{Exceedance probability parameter. Should be positive.}
 
+\item{B1}{Difference area between \code{t1} and \code{t2} (in this order).}
+
+\item{B2}{Intersection area between \code{t1} and \code{t2} (in this order).}
+
+\item{B3}{Difference area between \code{t2} and \code{t1} (in this order).}
+
 \item{transformation}{Boolean to use the Marginal Transform (MT) method.}
 
-\item{n_moments}{Number of moments achieved by transformed GPD marginals, if
+\item{n.moments}{Number of moments achieved by transformed GPD marginals, if
 used.}
 }
 \value{

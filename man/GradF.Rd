@@ -19,7 +19,3 @@ Gradient of function \code{f} at parameters \code{params} with offset \code{epsi
 \description{
 Computes gradident of a function given parameters and offset value epsilon.
 }
-\examples{
-GradF(function(params){prod(params^2)}, params = c(0.5, 7), epsilon = 1e-6)
-GradF(function(params){sum(params)}, params = c(2.5, 7), epsilon = 1e-6)
-}

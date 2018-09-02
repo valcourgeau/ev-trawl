@@ -19,7 +19,3 @@ DiffVal(value.p, value.m, epsilon)
 \description{
 Centered differentiation calculation.
 }
-\examples{
-DiffVal(4, 2, 1)
-DiffVal(2.5, 2, 2)
-}
