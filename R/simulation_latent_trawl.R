@@ -8,6 +8,7 @@
 #'
 #' @return n Gamma(alpha*dx*dy, beta) samples.
 #' @example GammaBox(2.0, 3.0, 0.5, 0.5, 10)
+#' @importFrom stats rgamma
 GammaBox <- function(alpha, beta, dx, dy, n){
   requireNamespace("stats", quietly = T)
   alpha <- abs(alpha)
@@ -174,6 +175,8 @@ SliceArea <- function(i, j, times, trawl.f.prim){
 #'   <- lapply(c(1,2,3,4), function(t) TrawlExpPrimitive(t, rho=0.2))
 #'   TrawlSliceReconstruct(alpha=3, beta=2, times=c(0, 1, 2, 3), marg.dist =
 #'   "gamma", n=1, fcts, prims)
+#'   @importFrom ghyp ghyp
+#'   @importFrom stats rgamma rnorm
 TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl.fs, trawl.fs.prim, deep_cols=30, ghyp.object=NA){
   # TODO Add GIG compatibility
   # TODO sort the trawl.fs and trawl.fs.prim as the times
@@ -358,6 +361,7 @@ rtrawl <- function(alpha, beta, times, marg.dist, trawl.function=NA, trawl.fs=NA
 #'          marg.dist = marg.dist, n = n, transformation = transformation,
 #'          trawl.function= trawl.function)
 #'
+#' @importFrom stats runif rexp
 #' @export
 rlexceed <- function(alpha, beta, kappa, rho=NA, times, marg.dist, n, transformation,
                      trawl.function=NA, trawl.fs=NA, trawl.fs.prim=NA, n_moments = 4, deep_cols=30){

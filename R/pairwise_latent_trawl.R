@@ -939,6 +939,7 @@ MarginalSimpleLik <- function(values, params){
 #'
 #' @return Parameters of Log-likelihood maximisation of GPD distribued variables (i.e. non-zero exceedances).
 #' @example MarginalSimpleLik(c(2.0, 0.3, 6.15, 0, 0.31), c(2.1, 1.17, 0.52, 4.17))
+#' @importFrom stats optim
 GPDFit <- function(values, initial_guess, lower=c(0.1, 0.1), upper=c(20, 20)){
   requireNamespace("stats", quietly = TRUE)
 
@@ -959,6 +960,7 @@ GPDFit <- function(values, initial_guess, lower=c(0.1, 0.1), upper=c(20, 20)){
 #' exceed2 <- c(0, 0.3, 5.2, 0, 0, 3.0, 0, 2.2)
 #' val_array <- cbind(exceed1, exceed2)
 #' MoMGPD(val_array)
+#' @importFrom stats var sd
 MoMGPD <- function(values_array){
   # workds under the assumption that alpha > 2
   # values_array contains the time series with first axis as time and second as # of time series

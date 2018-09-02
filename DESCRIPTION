@@ -13,5 +13,8 @@ RoxygenNote: 6.1.0
 Suggests: testthat,
     ghyp,
     hypergeo,
-    fExtremes
-Imports: evir
+    fExtremes,
+    eva
+Imports: evir,
+    fExtremes,
+    stats

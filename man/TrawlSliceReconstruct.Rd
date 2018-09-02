@@ -41,4 +41,6 @@ fcts <- lapply(c(1,2,3,4), function(t) TrawlExp(t, rho=0.2)) prims
   <- lapply(c(1,2,3,4), function(t) TrawlExpPrimitive(t, rho=0.2))
   TrawlSliceReconstruct(alpha=3, beta=2, times=c(0, 1, 2, 3), marg.dist =
   "gamma", n=1, fcts, prims)
+  @importFrom ghyp ghyp
+  @importFrom stats rgamma rnorm
 }
