@@ -2,7 +2,7 @@
 % Please edit documentation in R/pairwise_latent_trawl.R
 \name{PairwiseOneZero}
 \alias{PairwiseOneZero}
-\title{Computes term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}
+\title{Computes term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x} positive
 with exponential trawl function.}
 \usage{
 PairwiseOneZero(x1, alpha, beta, kappa, B1, B2, B3, transformation = F,
@@ -28,11 +28,11 @@ PairwiseOneZero(x1, alpha, beta, kappa, B1, B2, B3, transformation = F,
 \item{n.moments}{Number of moments achieved by transformed GPD marginals, if used.}
 }
 \value{
-Second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}
+Second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x} positive
 with exponential trawl function.
 }
 \description{
-Computes term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}
+Computes term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x} positive
 with exponential trawl function.
 }
 \examples{

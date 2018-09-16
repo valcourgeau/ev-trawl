@@ -2,7 +2,7 @@
 % Please edit documentation in R/pairwise_latent_trawl.R
 \name{PairwiseOneZero22}
 \alias{PairwiseOneZero22}
-\title{Computes partial part of second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}.}
+\title{Computes partial part of second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x} positive.}
 \usage{
 PairwiseOneZero22(x1, alpha, beta, kappa, B2, trawlA)
 }
@@ -20,8 +20,8 @@ PairwiseOneZero22(x1, alpha, beta, kappa, B2, trawlA)
 \item{trawlA}{Total trawl set measure / area under trawl function.}
 }
 \value{
-Partial part of second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}.
+Partial part of second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x} positive.
 }
 \description{
-Computes partial part of second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x > 0}.
+Computes partial part of second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x} positive.
 }

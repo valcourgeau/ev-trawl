@@ -16,8 +16,7 @@ TrawlSliceReconstruct(alpha, beta, times, marg.dist, n, trawl.fs,
 \item{times}{Vectors of discret times.}
 
 \item{marg.dist}{Name of infinitely divisible distribution. Currenlty
-implemented: gamma, gaussian, generalised hyperbolic (ghyp), generalised
-inverse gaussian (gig).}
+implemented: gamma, gaussian}
 
 \item{n}{Number of simulations (so far, only \code{n=1} is implemented).}
 
@@ -26,9 +25,11 @@ inverse gaussian (gig).}
 \item{trawl.fs.prim}{collection of trawl functions primitives indexed on
 \code{times}.}
 
-\item{deep_cols}{Depth of reconstruction (columns). Default is 30.}
+\item{deep_cols}{Depth of reconstruction (columns). Default is 30 and must be
+positive.}
 
-\item{ghyp.object}{Object from \code{ghyp} package when using GH or GIG distributions.}
+\item{ghyp.object}{Object from \code{ghyp} package when using GH or GIG
+distributions.}
 }
 \value{
 Samples using trawl slice reconstruction disributed using

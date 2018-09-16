@@ -3,7 +3,7 @@
 \name{PairwiseOneZero2}
 \alias{PairwiseOneZero2}
 \title{Computes second term in latent trawl pairwise likelihood with \code{(x,0)}
-where \code{x > 0}.}
+where \code{x} positive.}
 \usage{
 PairwiseOneZero2(x1, alpha, beta, kappa, B1, B2, B3, trawlA)
 }
@@ -26,9 +26,9 @@ PairwiseOneZero2(x1, alpha, beta, kappa, B1, B2, B3, trawlA)
 }
 \value{
 Second term in latent trawl pairwise likelihood with \code{(x,0)}
-  where \code{x > 0}.
+  where \code{x} positive.
 }
 \description{
 Computes second term in latent trawl pairwise likelihood with \code{(x,0)}
-where \code{x > 0}.
+where \code{x} positive.
 }

@@ -2,8 +2,8 @@
 % Please edit documentation in R/pairwise_latent_trawl.R
 \name{PairwiseOneOne}
 \alias{PairwiseOneOne}
-\title{Computes latent trawl pairwise likelihood with \code{(x,x)} where \code{x >
-0} and \code{y > 0} with exponential trawl function.}
+\title{Computes latent trawl pairwise likelihood with \code{(x,x)} where \code{x}
+and \code{y} positive with exponential trawl function.}
 \usage{
 PairwiseOneOne(x1, x2, alpha, beta, kappa, B1, B2, B3,
   transformation = F, n.moments = 4)
@@ -31,12 +31,12 @@ PairwiseOneOne(x1, x2, alpha, beta, kappa, B1, B2, B3,
 used.}
 }
 \value{
-Latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0}
-  and \code{y > 0}.
+Latent trawl pairwise likelihood with \code{(x,x)} where \code{x} positive
+  and \code{y} positive.
 }
 \description{
-Computes latent trawl pairwise likelihood with \code{(x,x)} where \code{x >
-0} and \code{y > 0} with exponential trawl function.
+Computes latent trawl pairwise likelihood with \code{(x,x)} where \code{x}
+and \code{y} positive with exponential trawl function.
 }
 \examples{
 PairwiseOneOne(x1=0.5, x2=0.3, alpha=2, beta=3, B1 = 0.3, B2 = 0.7,

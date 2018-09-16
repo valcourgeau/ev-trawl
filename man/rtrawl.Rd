@@ -2,7 +2,11 @@
 % Please edit documentation in R/simulation_latent_trawl.R
 \name{rtrawl}
 \alias{rtrawl}
-\title{Simulation of trawl process path using Slice partition.}
+\title{Simulation of trawl process path using Slice partition. If using customised
+trawl functions and primitives (i.e. \code{trawl.function = NA}), then, it is
+required that the user provides \code{length(times) + deep_cols} such
+functions and primitives where the \code{deep_cols} first one are used to
+reconstuct the first trawl value.}
 \usage{
 rtrawl(alpha, beta, times, marg.dist, trawl.function = NA,
   trawl.fs = NA, trawl.fs.prim = NA, n, rho = NA, kappa = 0,
@@ -49,7 +53,11 @@ False (F).}
 Simulated path (size the same as times) of trawl process.
 }
 \description{
-Simulation of trawl process path using Slice partition.
+Simulation of trawl process path using Slice partition. If using customised
+trawl functions and primitives (i.e. \code{trawl.function = NA}), then, it is
+required that the user provides \code{length(times) + deep_cols} such
+functions and primitives where the \code{deep_cols} first one are used to
+reconstuct the first trawl value.
 }
 \examples{
 alpha <- 5

@@ -2,7 +2,7 @@
 % Please edit documentation in R/pairwise_latent_trawl.R
 \name{PairwiseOneOne1}
 \alias{PairwiseOneOne1}
-\title{Computes first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}.}
+\title{Computes first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x} positive and \code{y} positive.}
 \usage{
 PairwiseOneOne1(x1, x2, alpha, beta, kappa, B1, B2, B3)
 }
@@ -24,8 +24,8 @@ PairwiseOneOne1(x1, x2, alpha, beta, kappa, B1, B2, B3)
 \item{B3}{Difference area between \code{t2} and \code{t1} (in this order).}
 }
 \value{
-First term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}.
+First term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x} positive and \code{y} positive.
 }
 \description{
-Computes first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}.
+Computes first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x} positive and \code{y} positive.
 }

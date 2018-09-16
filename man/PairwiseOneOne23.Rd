@@ -3,7 +3,7 @@
 \name{PairwiseOneOne23}
 \alias{PairwiseOneOne23}
 \title{Computes second term in latent trawl pairwise likelihood with \code{(x,x)}
-where \code{x > 0} and \code{y > 0}.}
+where \code{x} positive and \code{y} positive.}
 \usage{
 PairwiseOneOne23(x1, x2, alpha, beta, kappa, B2, trawlA)
 }
@@ -24,9 +24,9 @@ PairwiseOneOne23(x1, x2, alpha, beta, kappa, B2, trawlA)
 }
 \value{
 Second term in latent trawl pairwise likelihood with \code{(x,x)}
-  where \code{x > 0} and \code{y > 0}.
+  where \code{x} positive and \code{y} positive.
 }
 \description{
 Computes second term in latent trawl pairwise likelihood with \code{(x,x)}
-where \code{x > 0} and \code{y > 0}.
+where \code{x} positive and \code{y} positive.
 }

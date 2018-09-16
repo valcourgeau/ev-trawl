@@ -153,8 +153,7 @@ SliceArea <- function(i, j, times, trawl.f.prim){
 #' @param beta (Gamma) Scale parameter.
 #' @param times Vectors of discret times.
 #' @param marg.dist Name of infinitely divisible distribution. Currenlty
-#'   implemented: gamma, gaussian, generalised hyperbolic (ghyp), generalised
-#'   inverse gaussian (gig).
+#'   implemented: gamma, gaussian
 #' @param n Number of simulations (so far, only \code{n=1} is implemented).
 #' @param trawl.fs collection of trawl functions indexed on \code{times}.
 #' @param trawl.fs.prim collection of trawl functions primitives indexed on
@@ -201,12 +200,12 @@ TrawlSliceReconstruct <- function(alpha, beta, times, marg.dist, n, trawl.fs, tr
              "gaussian" = stats::rnorm(n = 1, mean = alpha * slice_mat[main_index, second_index] / A,
                                   sd =  beta * sqrt(slice_mat[main_index, second_index] / A)),
              "normal" = stats::rnorm(n = 1, mean = alpha * slice_mat[main_index, second_index] / A,
-                              sd = beta * sqrt(slice_mat[main_index, second_index] / A)),
-             "gig" = ghyp::rgig(n = 1, lambda = -0.5, chi = alpha*slice_mat[main_index, second_index] / A,
-                                psi = beta*slice_mat[main_index, second_index] / A), # TODO
-             "gh" = ghyp::rghyp(n=1, object = ghyp.object)
+                              sd = beta * sqrt(slice_mat[main_index, second_index] / A)))
+             # "gig" = ghyp::rgig(n = 1, lambda = -0.5, chi = alpha*slice_mat[main_index, second_index] / A,
+             #                    psi = beta*slice_mat[main_index, second_index] / A), # TODO
+             # "gh" = ghyp::rghyp(n=1, object = ghyp.object)
              # TODO find what kind of new variables we need for ID property
-             )
+             # )
 
     }
   }

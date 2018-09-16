@@ -2,7 +2,7 @@
 % Please edit documentation in R/pairwise_latent_trawl.R
 \name{PairwiseOneOne11}
 \alias{PairwiseOneOne11}
-\title{Computes frst part of first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}.}
+\title{Computes frst part of first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x} positive and \code{y} positive.}
 \usage{
 PairwiseOneOne11(x1, x2, alpha, beta, kappa, B1, trawlA)
 }
@@ -22,8 +22,8 @@ PairwiseOneOne11(x1, x2, alpha, beta, kappa, B1, trawlA)
 \item{trawlA}{Total trawl set measure / area under trawl function.}
 }
 \value{
-Frst part of first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}.
+Frst part of first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x} positive and \code{y} positive.
 }
 \description{
-Computes frst part of first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x > 0} and \code{y > 0}.
+Computes frst part of first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x} positive and \code{y} positive.
 }
