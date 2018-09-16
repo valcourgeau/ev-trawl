@@ -1,6 +1,4 @@
 # source("./R/simulation_latent_trawl.R")
-requireNamespace("eva", quietly = T)
-
 gig.implemented <- F # Flag for GIG implementation testing
 
 context("Trawl functions")

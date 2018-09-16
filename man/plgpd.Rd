@@ -14,7 +14,7 @@ plgpd(x, alpha, beta, lower.tail = T)
 
 \item{beta}{Scale parameter, should be positive.}
 
-\item{lower.tail}{logical; if TRUE (default), probabilities are \code{P[X ≤
+\item{lower.tail}{logical; if TRUE (default), probabilities are \code{P[X <=
 x]} otherwise, \code{P[X > x]}.}
 }
 \value{

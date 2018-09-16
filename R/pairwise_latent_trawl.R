@@ -183,7 +183,7 @@ dlgpd <- function(x, alpha, beta){
 #' @param x value at which the pdf is evaluated.
 #' @param alpha Shape parameter.
 #' @param beta Scale parameter, should be positive.
-#' @param lower.tail logical; if TRUE (default), probabilities are \code{P[X ≤
+#' @param lower.tail logical; if TRUE (default), probabilities are \code{P[X <=
 #'   x]} otherwise, \code{P[X > x]}.
 #' @return GPD CDF function evaluated at x with shape and scale parameters
 #'   respectively alpha and beta.
@@ -674,7 +674,7 @@ PairwiseOneOne <- function(x1, x2, alpha, beta, kappa, B1, B2, B3, transformatio
 #'
 #' @export
 SinglePairPL <- function(x1, x2, alpha, beta, kappa, B1, B2, B3, transformation=F, n.moments=0){
-  # TODO check whether t1 should be <= t2 or not
+  # TODO check whether t1 should be smaller than t2 or not
   #print(x1)
 
   if(x1 < .Machine$double.eps){
