@@ -242,8 +242,9 @@ PairwiseZeroZero1 <- function(alpha, beta, kappa){
 #'
 #' @return Second part of latent trawl pairwise likelihood with \code{(x,y) = (0,0)}.
 PairwiseZeroZero2 <- function(alpha, beta, kappa, B1, B2, B3){
-  temp = (1 + 2 * kappa / beta)^{-alpha  * B2 / (B1 + B2)}
-  return((1 + kappa / beta)^{-alpha * (B1 + B3) / (B1+B2)} * temp)
+  A <- B1 + B2
+  temp = (1 + 2 * kappa / beta)^{-alpha  * B2 / A}
+  return((1 + kappa / beta)^{-alpha * ( 2 * B1) / A} * temp)
 }
 
 #' Computes latent trawl pairwise likelihood with \code{(x,y) = (0,0)} for Exponential
@@ -302,7 +303,7 @@ PairwiseOneZero1 <- function(x1, alpha, beta, kappa, trawlA){
 #'
 #' @return Partial part of second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x} positive.
 PairwiseOneZero21 <- function(x1, alpha, beta, kappa, B1, trawlA){
-  return( - alpha / beta * 1/trawlA * (1 + (kappa + x1) / beta)^{-alpha * B1 / trawlA - 1})
+  return( 1 / beta* (1 + (kappa + x1) / beta)^{-alpha * B1 / trawlA - 1})
 }
 
 #' Computes partial part of second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x} positive.
@@ -344,7 +345,7 @@ PairwiseOneZero23 <- function(x1, alpha, beta, kappa, B3, trawlA){
 #'
 #' @return Partial part of second term in latent trawl pairwise likelihood with \code{(x,0)} where \code{x} positive.
 PairwiseOneZero24 <- function(x1, alpha, beta, kappa, B1, trawlA){
-  return(trawlA * (1 + (kappa + x1) / beta) + B1 * kappa / beta)
+  return(-alpha * (1 + (kappa + x1) / beta) - alpha* B1/trawlA * kappa / beta)
 }
 
 #' Computes second term in latent trawl pairwise likelihood with \code{(x,0)}
@@ -433,7 +434,7 @@ PairwiseOneZero <- function(x1, alpha, beta, kappa, B1, B2, B3, transformation=F
 #'
 #' @return Frst part of first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x} positive and \code{y} positive.
 PairwiseOneOne11 <- function(x1, x2, alpha, beta, kappa, B1, trawlA){
-  return(alpha^2 / (beta* trawlA)^2 * (1+(kappa+x1)/beta)^{-alpha * B1 / trawlA-1})
+  return(1/beta^2 * (1+(kappa+x1)/beta)^{-alpha * B1 / trawlA-1})
 }
 
 #' Computes second part of first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x} positive and \code{y} positive.
@@ -448,7 +449,7 @@ PairwiseOneOne11 <- function(x1, x2, alpha, beta, kappa, B1, trawlA){
 #'
 #' @return Second part of first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x} positive and \code{y} positive.
 PairwiseOneOne12 <- function(x1, x2, alpha, beta, kappa, B2, trawlA){
-  return((1+(2*kappa+x1+x2)/beta)^{-alpha*B2/trawlA-1})
+  return((1+(2*kappa+x1+x2)/beta)^{-alpha*B2/trawlA-2})
 }
 
 #' Computes third part of first term in latent trawl pairwise likelihood with \code{(x,x)} where \code{x} positive and \code{y} positive.
@@ -502,24 +503,8 @@ PairwiseOneOne1 <- function(x1, x2, alpha, beta, kappa, B1, B2, B3){
 #' @return Second term in latent trawl pairwise likelihood with \code{(x,x)}
 #'   where \code{x} positive and \code{y} positive.
 PairwiseOneOne21 <- function(x1, x2, alpha, beta, kappa, B1, B2){
-  return(B1*B2*(1+(2*kappa+x1+x2)/beta)*(1+(kappa+x2)/beta))
-}
-
-#' Computes second term in latent trawl pairwise likelihood with \code{(x,x)}
-#' where \code{x} positive and \code{y} positive.
-#'
-#' @param x1 Positive value corresponding to \code{t1}.
-#' @param x2 Positive value corresponding to \code{t2}.
-#' @param alpha Shape parameter. Should be positive.
-#' @param beta Latent Gamma scale parameter. Should be positive.
-#' @param kappa Exceedance probability parameter. Should be positive.
-#' @param B1 Difference area between \code{t1} and \code{t2} (in this order).
-#' @param B3 Difference area between \code{t2} and \code{t1} (in this order).
-#'
-#' @return Second term in latent trawl pairwise likelihood with \code{(x,x)}
-#'   where \code{x} positive and \code{y} positive.
-PairwiseOneOne22 <- function(x1, x2, alpha, beta, kappa, B1, B3){
-  return(B1*B3*(1+(2*kappa+x1+x2)/beta)^2)
+  return(alpha^2/(B1+B2)^2*B1*B2*(1+(2*kappa+x1+x2)/beta)*
+           ((1+(kappa+x2)/beta) + (1+(kappa+x2)/beta)))
 }
 
 #' Computes second term in latent trawl pairwise likelihood with \code{(x,x)}
@@ -536,7 +521,7 @@ PairwiseOneOne22 <- function(x1, x2, alpha, beta, kappa, B1, B3){
 #' @return Second term in latent trawl pairwise likelihood with \code{(x,x)}
 #'   where \code{x} positive and \code{y} positive.
 PairwiseOneOne23 <- function(x1, x2, alpha, beta, kappa, B2, trawlA){
-  temp <- B2*(B2+1/alpha*trawlA)
+  temp <- -alpha*B2/trawlA * (-alpha*B2/trawlA - 1)
   temp <- temp*(1+(kappa+x1)/beta)*(1+(kappa+x2)/beta)
   return(temp)
 }
@@ -555,7 +540,7 @@ PairwiseOneOne23 <- function(x1, x2, alpha, beta, kappa, B2, trawlA){
 #' @return Second term in latent trawl pairwise likelihood with \code{(x,x)}
 #'   where \code{x} positive and \code{y} positive.
 PairwiseOneOne24 <- function(x1, x2, alpha, beta, kappa, B2, B3){
-  return(B2*B3*(1+(kappa+x1)/beta)*(1+(2*kappa+x1+x2)/beta))
+  return((alpha * B3/(B2+B3) * (1+(2*kappa+x1+x2)/beta))^2)
 }
 
 #' Computes second term in latent trawl pairwise likelihood with \code{(x,x)}
@@ -575,9 +560,9 @@ PairwiseOneOne24 <- function(x1, x2, alpha, beta, kappa, B2, B3){
 PairwiseOneOne2 <- function(x1, x2, alpha, beta, kappa, B1, B2, B3){
   temp <- PairwiseOneOne21(x1 = x1, x2 = x2, alpha = alpha,
                            beta = beta, kappa = kappa, B1 = B1, B2 = B2)
-  temp <- temp + PairwiseOneOne22(x1 = x1, x2 = x2, alpha = alpha,
-                                  beta = beta, kappa = kappa, B1 = B1,
-                                  B3 = B3)
+  # temp <- temp + PairwiseOneOne22(x1 = x1, x2 = x2, alpha = alpha,
+  #                                 beta = beta, kappa = kappa, B1 = B1,
+  #                                 B3 = B3)
   temp <- temp + PairwiseOneOne23(x1 = x1, x2 = x2, alpha = alpha,
                                   beta = beta, kappa = kappa, B2 = B2,
                                   trawlA = B1+B3)
